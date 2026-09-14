@@ -149,7 +149,7 @@ function recipientLabel(doc){
   const name=String(doc?.customerName||'').trim();if(!name)return '';
   const customer=db.customers.find(c=>(doc.customerId&&c.id===doc.customerId)||c.name===name);
   const explicit=doc.salutation&&doc.salutation!=='auto'?doc.salutation:customer?.salutation&&customer.salutation!=='auto'?customer.salutation:null;
-  const suffix=explicit||(/株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|社会福祉法人|医療法人|特定非営利活動法人|学校法人|組合|協会|病院|医院|事業所|センター|株式会社|（株）|\(株\)/.test(name)?'御中':'様');
+  const suffix=explicit||(/御中$/.test(name)?'御中':/様$/.test(name)?'様':/株式会社|有限会社|合同会社|合資会社|合名会社|一般社団法人|公益社団法人|社会福祉法人|医療法人|特定非営利活動法人|学校法人|組合|協会|病院|医院|事業所|センター|（株）|\(株\)/.test(name)?'御中':'様');
   return `${name.replace(/[\s　]*(様|御中)$/,'')}　${suffix}`;
 }
 (function(){
