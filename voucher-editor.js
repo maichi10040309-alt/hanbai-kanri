@@ -23,7 +23,7 @@
       const target=real[last-1]||body.lastElementChild;
       for(let n=0;n<empty;n++){const tr=document.createElement('tr');tr.className='ve-blank';tr.innerHTML='<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';if(target)target.after(tr);else body.append(tr)}
     }
-    document.querySelector('#ve-pages').textContent=`Page. 1 / ${pageCount}　（1ページ ${capacity}行）`;
+    const pager=document.querySelector('#ve-pages');if(pager)pager.textContent=`Page. 1 / ${pageCount}　（1ページ ${capacity}行）`;
   }
   window.drawLines=function(){originalDraw();decorateLines()};
   window.calc=function(){originalCalc();const t=totals();for(const [key,value] of Object.entries({sub:t.sub,tax:t.tax,total:t.total})){const node=document.querySelector(`[data-ve-total="${key}"]`);if(node)node.textContent=yen(value)}};
@@ -42,7 +42,7 @@
     sheet.querySelector('.ve-due-slot').innerHTML='<label class="ve-field"><span>支払期限・納入期日</span></label>';sheet.querySelector('.ve-due-slot label').append(form.querySelector('#d-due'));
     sheet.querySelector('.ve-lines').append(lineTable,lineButton);
     sheet.querySelector('.ve-note').innerHTML='<label class="ve-field"><span>備考</span></label>';sheet.querySelector('.ve-note label').append(note.querySelector('#d-note'));
-    form.remove();note.remove();oldHeading?.remove();total.remove();card.append(actions);
+    form.remove();note.remove();oldHeading?.remove();total.hidden=true;card.append(actions);
     sheet.querySelector('#d-date').addEventListener('change',keepFields);
     toolbar.querySelector('#d-type').addEventListener('change',()=>{keepFields();window.editor()});
     sheet.querySelectorAll('[data-extra]').forEach(el=>el.addEventListener('change',keepFields));
