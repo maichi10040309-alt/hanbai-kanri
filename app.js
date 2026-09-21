@@ -131,17 +131,23 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     if(d.type==='領収書')return `<div class="ve-extra ve-receipt">${input('cashAmount','現金',d.cashAmount,'number')}${input('checkAmount','小切手',d.checkAmount,'number')}${input('billAmount','手形',d.billAmount,'number')}${input('offsetAmount','相殺',d.offsetAmount,'number')}${input('feeAmount','振込手数料',d.feeAmount,'number')}${input('otherAmount','その他',d.otherAmount,'number')}${input('deliveryDestination','納品先',d.deliveryDestination)}</div>`;
     return '';
   }
+  function shapeDeliveryLines(table){
+    if(!table)return;const heads=[...table.querySelectorAll('thead th')];if(heads.length===8){heads[1].textContent='品 番 ・ 品 名';heads[7].textContent='備 考';heads[0].remove();heads[5].remove()}
+    table.querySelectorAll('tbody tr[data-line]').forEach(row=>{const cells=[...row.children];if(cells.length!==8)return;const code=cells[0].querySelector('input'),name=cells[1].querySelector('input'),tax=cells[5].querySelector('select'),actions=cells[7];code.placeholder='品番';name.placeholder='品名';cells[1].classList.add('delivery-item-cell');cells[1].prepend(code);tax.title='税率';tax.classList.add('delivery-tax');actions.prepend(tax);cells[0].remove();cells[5].remove()});
+  }
   function decorateLines(){
     const body=document.getElementById('lines');if(!body||!editing)return;
     const capacity=rows[editing.type]||12,used=editing.lines.length,pageCount=Math.max(1,Math.ceil(used/capacity));
     body.querySelectorAll('.ve-page-break,.ve-blank').forEach(el=>el.remove());
     const real=[...body.querySelectorAll('tr[data-line]')];
+    const columns=editing.type==='納品書'?6:8;
     for(let p=0;p<pageCount;p++){
-      if(p){const marker=document.createElement('tr');marker.className='ve-page-break';marker.innerHTML=`<td colspan="8">${p+1}ページ目の明細</td>`;real[p*capacity]?.before(marker)}
+      if(p){const marker=document.createElement('tr');marker.className='ve-page-break';marker.innerHTML=`<td colspan="${columns}">${p+1}ページ目の明細</td>`;real[p*capacity]?.before(marker)}
       const last=Math.min(used,(p+1)*capacity),empty=capacity-(last-p*capacity);
       const target=real[last-1]||body.lastElementChild;
-      for(let n=0;n<empty;n++){const tr=document.createElement('tr');tr.className='ve-blank';tr.innerHTML='<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';if(target)target.after(tr);else body.append(tr)}
+      for(let n=0;n<empty;n++){const tr=document.createElement('tr');tr.className='ve-blank';tr.innerHTML='<td></td>'.repeat(columns);if(target)target.after(tr);else body.append(tr)}
     }
+    if(editing.type==='納品書')shapeDeliveryLines(body.closest('table'));
     const pager=document.querySelector('#ve-pages');if(pager)pager.textContent=`Page. 1 / ${pageCount}　（1ページ ${capacity}行）`;
   }
   function reshapeSummarySheet(sheet,d,company){
@@ -157,6 +163,13 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     for(const key of ['previousBalance','receivedAmount','transferFee'])extra[key]?.addEventListener('input',updateCarry);extra.carryForward?.addEventListener('input',()=>{keepFields();window.calc()});
     sheet.querySelector('.gb-edit-lines').append(lineTable,lineButton);
     sheet.querySelector('.gb-edit-hidden').append(subject,due,note,extra.closingDate||document.createTextNode(''));
+  }
+  function reshapeDeliverySheet(sheet,d,company){
+    const customer=sheet.querySelector('#d-customer'),customerList=sheet.querySelector('#customer-list'),date=sheet.querySelector('#d-date'),subject=sheet.querySelector('#d-subject'),due=sheet.querySelector('#d-due'),note=sheet.querySelector('#d-note'),lineTable=sheet.querySelector('.line-table'),lineButton=lineTable?.nextElementSibling;
+    const stamp=/^data:image\/(png|jpeg|webp);base64,/.test(company.stamp||'')?`<img src="${company.stamp}" alt="社印">`:'';
+    sheet.className='ve-sheet ve-delivery delivery-editor';
+    sheet.innerHTML=`<div class="delivery-edit-top"><div class="ve-field delivery-customer-entry"><span>得意先</span><div class="delivery-customer-control"></div></div><div class="delivery-edit-title"><h2>納品書</h2></div><div class="delivery-edit-meta"><label><b>発行日</b><span class="delivery-date-slot"></span></label><div><b>No.</b><span>${h(d.number||'保存時に発番')}</span></div><small id="ve-pages">Page. 1 / 1</small></div><div class="delivery-edit-company">${h(company.name)}<br>〒${h(company.postal)}<br>${h(company.address)}<br>TEL. ${h(company.tel)}${company.fax?`　FAX. ${h(company.fax)}`:''}${company.invoiceNo?`<br>登録番号：${h(company.invoiceNo)}`:''}${stamp}</div><div class="delivery-edit-approval"><span>検<br>印</span><span></span><span></span><span></span></div></div><div class="delivery-edit-intro">毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。</div><div class="delivery-edit-lines"></div><div class="delivery-edit-totals"><div class="delivery-total-label">合<br>計</div><div><b>税抜合計</b><strong data-ve-total="sub"></strong></div><div><b>消費税額</b><strong data-ve-total="tax"></strong></div><div><b>合計金額</b><strong data-ve-total="total"></strong></div></div><div class="delivery-edit-hidden"></div>`;
+    sheet.querySelector('.delivery-customer-control').append(customer,customerList);sheet.querySelector('.delivery-date-slot').append(date);sheet.querySelector('.delivery-edit-lines').append(lineTable,lineButton);sheet.querySelector('.delivery-edit-hidden').append(subject,due,note);
   }
   window.drawLines=function(){originalDraw();decorateLines()};
   window.calc=function(){originalCalc();const t=totals();for(const [key,value] of Object.entries({sub:t.sub,tax:t.tax,total:t.total})){const node=document.querySelector(`[data-ve-total="${key}"]`);if(node)node.textContent=yen(value)}};
@@ -175,7 +188,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     sheet.querySelector('.ve-due-slot').innerHTML='<label class="ve-field"><span>支払期限・納入期日</span></label>';sheet.querySelector('.ve-due-slot label').append(form.querySelector('#d-due'));
     sheet.querySelector('.ve-lines').append(lineTable,lineButton);
     sheet.querySelector('.ve-note').innerHTML='<label class="ve-field"><span>備考</span></label>';sheet.querySelector('.ve-note label').append(note.querySelector('#d-note'));
-    if(type==='合計請求書')reshapeSummarySheet(sheet,d,company);
+    if(type==='合計請求書')reshapeSummarySheet(sheet,d,company);else if(type==='納品書')reshapeDeliverySheet(sheet,d,company);
     form.remove();note.remove();oldHeading?.remove();total.hidden=true;card.append(actions);
     sheet.querySelector('#d-date').addEventListener('change',keepFields);
     toolbar.querySelector('#d-type').addEventListener('change',()=>{keepFields();window.editor()});
@@ -197,7 +210,7 @@ function recipientLabel(doc){
   const oldModal=window.masterModal,oldSaveMaster=window.saveMaster,oldEditor=window.editor,oldSaveDoc=window.saveDoc;
   window.masterModal=function(kind,x){oldModal(kind,x);if(kind!=='customers')return;const row=db.customers.find(c=>c.id===x),field=document.createElement('div');field.className='field';field.innerHTML='<label for="m-salutation">宛名の敬称</label><select id="m-salutation"><option value="auto">自動判定</option><option value="様">様（個人）</option><option value="御中">御中（企業・団体）</option></select><small class="hint">判定が違う場合は「様」または「御中」を指定してください。</small>';document.querySelector('#m-closing')?.closest('.field')?.after(field);field.querySelector('select').value=row?.salutation||'auto'};
   window.saveMaster=function(kind,x){const salutation=kind==='customers'?document.querySelector('#m-salutation')?.value:null;oldSaveMaster(kind,x);if(kind==='customers'&&salutation){const row=db.customers.find(c=>c.id===x);if(row){row.salutation=salutation;save()}}};
-  window.editor=function(){oldEditor();const customer=document.querySelector('#d-customer');if(!customer)return;const wrapper=customer.closest('.ve-field')||customer.parentElement;const label=document.createElement('label');label.className='ve-field honorific-choice';label.innerHTML='<span>宛名の敬称</span><select id="d-salutation"><option value="auto">自動判定</option><option value="様">様（個人）</option><option value="御中">御中（企業・団体）</option></select><small id="recipient-preview"></small>';wrapper.classList.contains('gb-customer-entry')?wrapper.append(label):wrapper.after(label);const select=label.querySelector('select');select.value=editing?.salutation||'auto';const update=()=>{if(!editing)return;editing.customerName=customer.value;editing.customerId=db.customers.find(c=>c.name===customer.value)?.id||'';editing.salutation=select.value;label.querySelector('#recipient-preview').textContent='印刷時：'+recipientLabel(editing)};customer.addEventListener('input',update);customer.addEventListener('change',update);select.addEventListener('change',update);update()};
+  window.editor=function(){oldEditor();const customer=document.querySelector('#d-customer');if(!customer)return;const wrapper=customer.closest('.ve-field')||customer.parentElement;const label=document.createElement('label');label.className='ve-field honorific-choice';label.innerHTML='<span>宛名の敬称</span><select id="d-salutation"><option value="auto">自動判定</option><option value="様">様（個人）</option><option value="御中">御中（企業・団体）</option></select><small id="recipient-preview"></small>';wrapper.matches('.gb-customer-entry,.delivery-customer-entry')?wrapper.append(label):wrapper.after(label);const select=label.querySelector('select');select.value=editing?.salutation||'auto';const update=()=>{if(!editing)return;editing.customerName=customer.value;editing.customerId=db.customers.find(c=>c.name===customer.value)?.id||'';editing.salutation=select.value;label.querySelector('#recipient-preview').textContent='印刷時：'+recipientLabel(editing)};customer.addEventListener('input',update);customer.addEventListener('change',update);select.addEventListener('change',update);update()};
   window.saveDoc=function(){const select=document.querySelector('#d-salutation');if(select&&editing)editing.salutation=select.value;oldSaveDoc()};
 })();
 

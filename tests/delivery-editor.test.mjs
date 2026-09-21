@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
+const css=readFileSync(new URL('../voucher-editor.css',import.meta.url),'utf8');
+
+test('delivery documents switch to the print-shaped editor',()=>{
+  assert.match(app,/else if\(type==='納品書'\)reshapeDeliverySheet\(sheet,d,company\)/);
+  assert.match(app,/sheet\.className='ve-sheet ve-delivery delivery-editor'/);
+  assert.match(app,/<h2>納品書<\/h2>/);
+});
+
+test('delivery editor keeps customer, date, lines and hidden persistence fields',()=>{
+  assert.match(app,/delivery-customer-control[^`]*delivery-date-slot[^`]*delivery-edit-lines/s);
+  assert.match(app,/delivery-edit-hidden[^`]*append\(subject,due,note\)/s);
+  assert.match(app,/data-ve-total="sub"/);
+  assert.match(app,/data-ve-total="tax"/);
+  assert.match(app,/data-ve-total="total"/);
+});
+
+test('delivery lines match the six printed columns',()=>{
+  assert.match(app,/function shapeDeliveryLines/);
+  assert.match(app,/const columns=editing\.type==='納品書'\?6:8/);
+  assert.match(app,/heads\[1\]\.textContent='品 番 ・ 品 名'/);
+  assert.match(css,/\.delivery-edit-lines \.line-table th:nth-child\(1\)\{width:42%\}/);
+});
+
+test('delivery editor mirrors printed header and totals layout',()=>{
+  for(const selector of ['delivery-edit-title','delivery-edit-meta','delivery-edit-company','delivery-edit-approval','delivery-edit-intro','delivery-edit-totals'])assert.match(css,new RegExp(`\\.${selector}`));
+  assert.match(css,/\.delivery-editor\{position:relative;min-height:760px/);
+});
