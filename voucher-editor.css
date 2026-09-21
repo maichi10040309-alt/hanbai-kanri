@@ -3,7 +3,7 @@
 .gb-editor{position:relative;min-height:1050px!important;padding:28px 30px!important;color:#111!important;background:#fff!important}
 .gb-edit-header{display:grid;grid-template-columns:52% 48%;min-height:245px}
 .gb-edit-customer{position:relative;padding:48px 0 0 2px}
-.gb-customer-entry{position:relative;width:88%;height:105px;border:1px solid #b9bec2;padding:42px 10px 8px}
+.gb-customer-entry{position:relative;width:88%;height:142px;border:1px solid #b9bec2;padding:42px 10px 8px}
 .gb-edit-label{position:absolute;top:8px;left:10px;color:#64747e;font-size:11px}
 .gb-customer-control input{font-size:18px!important;border:0!important;border-bottom:1px solid #111!important;padding:5px 2px!important}
 .gb-edit-heading{position:relative;text-align:center}
@@ -25,5 +25,5 @@
 .gb-edit-lines .line-table th{color:#078fd6!important;background:#fff!important;font-size:10px!important}.gb-edit-lines .line-table input,.gb-edit-lines .line-table select{font-size:11px!important;padding:3px!important}
 .gb-edit-lines .line-table th:nth-child(1){width:11%}.gb-edit-lines .line-table th:nth-child(2){width:30%}.gb-edit-lines .line-table th:nth-child(3){width:8%}.gb-edit-lines .line-table th:nth-child(4){width:8%}.gb-edit-lines .line-table th:nth-child(5){width:13%}.gb-edit-lines .line-table th:nth-child(6){width:8%}.gb-edit-lines .line-table th:nth-child(7){width:14%}.gb-edit-lines .line-table th:nth-child(8){width:8%}
 .gb-edit-lines .ve-blank td{height:42px;background:#effbff}.gb-edit-hidden{display:none}
-.gb-edit-customer>.honorific-choice{position:absolute;left:12px;bottom:-32px;width:82%;grid-template-columns:auto 100px 1fr;align-items:center;gap:6px}.gb-edit-customer>.honorific-choice span{font-size:10px}.gb-edit-customer>.honorific-choice select{font-size:11px;padding:2px}.gb-edit-customer>.honorific-choice small{font-size:10px;color:#078fd6}
+.gb-customer-entry>.honorific-choice{position:absolute;top:82px;left:10px;right:10px;grid-template-columns:auto 100px 1fr;align-items:center;gap:6px}.gb-customer-entry>.honorific-choice span{font-size:10px}.gb-customer-entry>.honorific-choice select{font-size:11px;padding:2px}.gb-customer-entry>.honorific-choice small{font-size:10px;color:#078fd6;white-space:nowrap}
 @media(max-width:900px){.gb-editor{min-width:900px!important}}

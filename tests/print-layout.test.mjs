@@ -63,4 +63,5 @@ test('GB1116 separates recipient name and honorific', () => {
   assert.match(source, /function recipientParts/);
   assert.match(source, /class="gb-customer-name"/);
   assert.match(source, /class="gb-customer-suffix"/);
+  assert.match(source, /gb-customer-suffix\{position:absolute;right:2mm;bottom:2\.4mm/);
 });

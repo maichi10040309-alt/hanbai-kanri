@@ -27,6 +27,11 @@ test('summary totals and lines use the blue seven-column form',()=>{
 });
 
 test('editor assets are cache-busted',()=>{
-  assert.match(html,/voucher-editor\.css\?v=20260921-2/);
-  assert.match(html,/app\.js\?v=20260921-9/);
+  assert.match(html,/voucher-editor\.css\?v=20260921-3/);
+  assert.match(html,/app\.js\?v=20260921-10/);
+});
+
+test('summary honorific controls sit directly below the customer name',()=>{
+  assert.match(app,/wrapper\.classList\.contains\('gb-customer-entry'\)\?wrapper\.append\(label\):wrapper\.after\(label\)/);
+  assert.match(css,/\.gb-customer-entry>\.honorific-choice\{position:absolute;top:82px/);
 });
