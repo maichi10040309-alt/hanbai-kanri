@@ -11,6 +11,20 @@ test('summary invoice list exposes monthly closing and manual creation',()=>{
   assert.match(app,/monthlyInvoiceModal\(\)/);
 });
 
+test('only customers with unbilled deliveries in the selected period are offered',()=>{
+  assert.match(app,/function monthlyEligibleCustomers/);
+  assert.match(app,/d\.date>=start&&d\.date<=end&&!used\.has\(d\.id\)/);
+  assert.match(app,/未集計の納品書がある得意先はいません/);
+});
+
+test('multiple customers can be selected and invoiced in one operation',()=>{
+  assert.match(app,/class="monthly-customer-check"/);
+  assert.match(app,/function selectedMonthlyCustomerIds/);
+  assert.match(app,/async function createMonthlyInvoices/);
+  assert.match(app,/for\(const customerId of customerIds\)/);
+  assert.match(app,/db\.documents\.push\(doc\)/);
+});
+
 test('customer closing day determines the billing period',()=>{
   const source=app.match(/function closingPeriod\([^\n]+/)[0];
   const closingPeriod=Function(`${source};return closingPeriod`)();
