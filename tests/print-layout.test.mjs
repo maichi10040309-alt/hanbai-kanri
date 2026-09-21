@@ -12,7 +12,8 @@ test('delivery totals use a fixed table instead of a fragile grid', () => {
 
 test('delivery detail and totals borders overlap without a gap',()=>{
   assert.match(source,/const deliveryLineFix=/);
-  assert.match(source,/delivery-totals\{top:122mm\}/);
+  assert.match(source,/delivery-totals\{top:124\.88mm/);
+  assert.match(source,/delivery-totals\{top:124\.88mm;border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
   assert.match(source,/\$\{deliveryLineFix\}/);
   assert.match(source,/delivery \.lines\{border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
 });
