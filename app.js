@@ -118,6 +118,18 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     }
     const pager=document.querySelector('#ve-pages');if(pager)pager.textContent=`Page. 1 / ${pageCount}　（1ページ ${capacity}行）`;
   }
+  function reshapeSummarySheet(sheet,d,company){
+    const customer=sheet.querySelector('#d-customer'),customerList=sheet.querySelector('#customer-list'),date=sheet.querySelector('#d-date'),subject=sheet.querySelector('#d-subject'),due=sheet.querySelector('#d-due'),note=sheet.querySelector('#d-note'),lineTable=sheet.querySelector('.line-table'),lineButton=lineTable?.nextElementSibling;
+    const extra=Object.fromEntries([...sheet.querySelectorAll('[data-extra]')].map(el=>[el.dataset.extra,el]));
+    const stamp=/^data:image\/(png|jpeg|webp);base64,/.test(company.stamp||'')?`<img src="${company.stamp}" alt="社印">`:'';
+    sheet.className='ve-sheet ve-summary gb-editor';
+    sheet.innerHTML=`<div class="gb-edit-header"><div class="gb-edit-customer"><div class="ve-field gb-customer-entry"><span class="gb-edit-label">得意先</span><div class="gb-customer-control"></div></div></div><div class="gb-edit-heading"><h2>請　求　書</h2><div class="gb-edit-date"></div><div class="gb-edit-no">No. ${h(d.number||'保存時に発番')}<br><small id="ve-pages">Page. 1 / 1</small></div><div class="gb-edit-company">${h(company.name)}<br>〒${h(company.postal)}<br>${h(company.address)}<br>TEL. ${h(company.tel)}${company.fax?`　FAX. ${h(company.fax)}`:''}${company.invoiceNo?`<br>登録番号：${h(company.invoiceNo)}`:''}${stamp}</div></div></div><div class="gb-edit-message">お客様コードNo.<br><br>毎度ありがとうございます。<br>下記の通り御請求申し上げます。</div><div class="gb-edit-bank">${h(company.bank||'振込先は自社設定から入力できます')}</div><div class="gb-edit-stamp-box"><span></span><span></span></div><div class="gb-edit-summary"><label><b>前回御請求額</b><span data-slot="previousBalance"></span></label><label><b>御 入 金 額</b><span data-slot="receivedAmount"></span></label><label><b>振込手数料</b><span data-slot="transferFee"></span></label><label><b>繰 越 金 額</b><span data-slot="carryForward"></span></label><div><b>税抜御買上額</b><strong data-ve-total="sub"></strong></div><div><b>消 費 税</b><strong data-ve-total="tax"></strong></div><div class="gb-edit-grand"><b>今回御請求額</b><strong data-ve-total="total"></strong></div></div><div class="gb-edit-lines"><div class="gb-edit-lines-title">商品コード・品名　／　数量・単位・単価・税率・金額</div></div><div class="gb-edit-hidden"></div>`;
+    sheet.querySelector('.gb-customer-control').append(customer,customerList);
+    sheet.querySelector('.gb-edit-date').append(date);
+    for(const key of ['previousBalance','receivedAmount','transferFee','carryForward'])if(extra[key])sheet.querySelector(`[data-slot="${key}"]`).append(extra[key]);
+    sheet.querySelector('.gb-edit-lines').append(lineTable,lineButton);
+    sheet.querySelector('.gb-edit-hidden').append(subject,due,note,extra.closingDate||document.createTextNode(''));
+  }
   window.drawLines=function(){originalDraw();decorateLines()};
   window.calc=function(){originalCalc();const t=totals();for(const [key,value] of Object.entries({sub:t.sub,tax:t.tax,total:t.total})){const node=document.querySelector(`[data-ve-total="${key}"]`);if(node)node.textContent=yen(value)}};
   window.editor=function(){
@@ -135,6 +147,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     sheet.querySelector('.ve-due-slot').innerHTML='<label class="ve-field"><span>支払期限・納入期日</span></label>';sheet.querySelector('.ve-due-slot label').append(form.querySelector('#d-due'));
     sheet.querySelector('.ve-lines').append(lineTable,lineButton);
     sheet.querySelector('.ve-note').innerHTML='<label class="ve-field"><span>備考</span></label>';sheet.querySelector('.ve-note label').append(note.querySelector('#d-note'));
+    if(type==='合計請求書')reshapeSummarySheet(sheet,d,company);
     form.remove();note.remove();oldHeading?.remove();total.hidden=true;card.append(actions);
     sheet.querySelector('#d-date').addEventListener('change',keepFields);
     toolbar.querySelector('#d-type').addEventListener('change',()=>{keepFields();window.editor()});
