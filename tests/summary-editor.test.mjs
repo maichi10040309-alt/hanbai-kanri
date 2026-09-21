@@ -27,8 +27,8 @@ test('summary totals and lines use the blue seven-column form',()=>{
 });
 
 test('editor assets are cache-busted',()=>{
-  assert.match(html,/voucher-editor\.css\?v=20260921-3/);
-  assert.match(html,/app\.js\?v=20260921-10/);
+  assert.match(html,/voucher-editor\.css\?v=20260921-4/);
+  assert.match(html,/app\.js\?v=20260921-11/);
 });
 
 test('summary honorific controls sit directly below the customer name',()=>{
