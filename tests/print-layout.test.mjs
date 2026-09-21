@@ -14,6 +14,7 @@ test('delivery detail and totals borders overlap without a gap',()=>{
   assert.match(source,/const deliveryLineFix=/);
   assert.match(source,/delivery-totals\{top:122mm\}/);
   assert.match(source,/\$\{deliveryLineFix\}/);
+  assert.match(source,/delivery \.lines\{border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
 });
 
 test('delivery totals stay within the 202 mm detail-table width', () => {

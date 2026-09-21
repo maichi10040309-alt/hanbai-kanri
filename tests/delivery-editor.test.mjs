@@ -37,4 +37,7 @@ test('delivery borders remain continuous around lines and totals',()=>{
   assert.match(css,/\.delivery-item-inputs\{display:grid/);
   assert.doesNotMatch(css,/\.delivery-item-cell\{display:grid/);
   assert.match(css,/\.delivery-edit-totals\{height:48px;border:1px solid #111;border-top:0/);
+  assert.match(css,/border-collapse:separate!important;border-spacing:0!important;border:1px solid #111!important/);
+  assert.match(css,/tr>\*:last-child\{border-right:0!important\}/);
+  assert.match(css,/tbody tr:last-child>td\{border-bottom:0!important\}/);
 });
