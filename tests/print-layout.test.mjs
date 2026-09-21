@@ -34,19 +34,19 @@ test('specialized print templates remain enabled', () => {
 });
 
 test('GB1116 uses the Rakuda reference positions', () => {
-  assert.match(source, /gb-customer\{top:26\.5mm;left:23mm;width:93mm/);
-  assert.match(source, /gb-issuer\{top:36mm;right:9\.2mm;width:62mm/);
-  assert.match(source, /company-stamp\{top:33\.4mm;right:2\.2mm/);
+  assert.match(source, /gb-customer\{top:26\.5mm;left:20\.8mm;width:83\.5mm/);
+  assert.match(source, /gb-issuer\{top:34\.3mm;right:9\.2mm;width:62mm/);
+  assert.match(source, /company-stamp\{top:31\.5mm;right:2\.2mm/);
   assert.match(source, /gb-bank\{position:absolute;top:66\.3mm;left:78\.8mm/);
-  assert.match(source, /gb-summary\{position:absolute;top:89\.5mm;left:17\.8mm;width:182mm/);
-  assert.match(source, /gb-detail\{top:105mm;left:17\.8mm;width:182\.6mm/);
+  assert.match(source, /gb-summary\{position:absolute;top:86\.1mm;left:17\.8mm;width:182mm/);
+  assert.match(source, /gb-detail\{top:101\.7mm;left:17\.8mm;width:182\.6mm/);
   assert.match(source, /grid-template-columns:19\.8mm 12\.9mm 48\.3mm 15\.5mm 9\.9mm 25\.4mm 25\.4mm 25\.4mm/);
 });
 
 test('GB1116 prints dates into the preprinted year month day fields', () => {
   assert.match(source, /function dateParts/);
-  assert.match(source, /gb-date\{top:13\.5mm;left:129mm/);
-  assert.match(source, /gb-no\{top:13\.8mm;left:185mm;right:auto;width:23mm/);
+  assert.match(source, /gb-date\{top:10\.1mm;left:128\.2mm/);
+  assert.match(source, /gb-no\{top:10\.4mm;left:185mm;right:auto;width:23mm[^}]*transform:translate\(0,var\(--gb-y,0mm\)\)/);
   assert.doesNotMatch(source, /gb-no\{[^}]*right:-/);
   assert.match(source, /gb-date span:nth-child\(2\)\{left:20mm\}/);
   assert.match(source, /gb-date span:nth-child\(3\)\{left:32mm\}/);
@@ -54,7 +54,13 @@ test('GB1116 prints dates into the preprinted year month day fields', () => {
 });
 
 test('GB1116 right-aligns amounts and includes item codes', () => {
-  assert.match(source, /gb-summary span\{[^}]*justify-content:flex-end/);
-  assert.match(source, /gb-row \.num\{display:flex;align-items:center;justify-content:flex-end/);
+  assert.match(source, /gb-summary span\{[^}]*width:100%[^}]*justify-content:flex-end/);
+  assert.match(source, /gb-row \.num\{display:flex;width:100%;justify-self:stretch[^}]*justify-content:flex-end/);
   assert.match(source, /l\.code\?`\$\{safe\(l\.code\)\}<br>`/);
+});
+
+test('GB1116 separates recipient name and honorific', () => {
+  assert.match(source, /function recipientParts/);
+  assert.match(source, /class="gb-customer-name"/);
+  assert.match(source, /class="gb-customer-suffix"/);
 });
