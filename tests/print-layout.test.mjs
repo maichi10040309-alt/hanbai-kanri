@@ -10,6 +10,12 @@ test('delivery totals use a fixed table instead of a fragile grid', () => {
   assert.doesNotMatch(source, /delivery-totals\{grid-template-columns/);
 });
 
+test('delivery detail and totals borders overlap without a gap',()=>{
+  assert.match(source,/const deliveryLineFix=/);
+  assert.match(source,/delivery-totals\{top:122mm\}/);
+  assert.match(source,/\$\{deliveryLineFix\}/);
+});
+
 test('delivery totals stay within the 202 mm detail-table width', () => {
   const fixedWidths = [...source.matchAll(/<col style="width:(\d+(?:\.\d+)?)mm">/g)]
     .slice(0, 5)

@@ -30,3 +30,11 @@ test('delivery editor mirrors printed header and totals layout',()=>{
   for(const selector of ['delivery-edit-title','delivery-edit-meta','delivery-edit-company','delivery-edit-approval','delivery-edit-intro','delivery-edit-totals'])assert.match(css,new RegExp(`\\.${selector}`));
   assert.match(css,/\.delivery-editor\{position:relative;min-height:760px/);
 });
+
+test('delivery borders remain continuous around lines and totals',()=>{
+  assert.match(app,/class="delivery-edit-controls"/);
+  assert.match(app,/delivery-edit-lines'\)\.append\(lineTable\)/);
+  assert.match(css,/\.delivery-item-inputs\{display:grid/);
+  assert.doesNotMatch(css,/\.delivery-item-cell\{display:grid/);
+  assert.match(css,/\.delivery-edit-totals\{height:48px;border:1px solid #111;border-top:0/);
+});
