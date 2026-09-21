@@ -36,8 +36,15 @@ test('delivery borders remain continuous around lines and totals',()=>{
   assert.match(app,/delivery-edit-lines'\)\.append\(lineTable\)/);
   assert.match(css,/\.delivery-item-inputs\{display:grid/);
   assert.doesNotMatch(css,/\.delivery-item-cell\{display:grid/);
-  assert.match(css,/\.delivery-edit-totals\{height:48px;border:1px solid #111;border-top:0/);
+  assert.match(css,/\.delivery-edit-totals\{height:50px;border:1px solid #111;border-top:0/);
   assert.match(css,/border-collapse:separate!important;border-spacing:0!important;border:1px solid #111!important/);
   assert.match(css,/tr>\*:last-child\{border-right:0!important\}/);
   assert.match(css,/tbody tr:last-child>td\{border-bottom:0!important\}/);
+});
+
+test('delivery editor text remains readable against the ruled form',()=>{
+  assert.match(css,/delivery-edit-intro[^}]*font-size:13px;font-weight:600/);
+  assert.match(css,/line-table th\{[^}]*font-size:13px;font-weight:700/);
+  assert.match(css,/line-table input,[^}]*font-size:13px;font-weight:600;color:#000/);
+  assert.match(css,/delivery-edit-totals strong[^}]*font-size:15px;font-weight:700/);
 });
