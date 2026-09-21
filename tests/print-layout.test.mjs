@@ -46,7 +46,8 @@ test('GB1116 uses the Rakuda reference positions', () => {
 test('GB1116 prints dates into the preprinted year month day fields', () => {
   assert.match(source, /function dateParts/);
   assert.match(source, /gb-date\{top:13\.5mm;left:129mm/);
-  assert.match(source, /gb-no\{top:13\.8mm;right:-10mm/);
+  assert.match(source, /gb-no\{top:13\.8mm;left:185mm;right:auto;width:23mm/);
+  assert.doesNotMatch(source, /gb-no\{[^}]*right:-/);
   assert.match(source, /gb-date span:nth-child\(2\)\{left:20mm\}/);
   assert.match(source, /gb-date span:nth-child\(3\)\{left:32mm\}/);
   assert.doesNotMatch(source, /\$\{safe\(d\.number\)\}　\$\{i\+1\}\/\$\{pages\.length\}/);
