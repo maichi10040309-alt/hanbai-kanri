@@ -18,12 +18,12 @@ test('delivery detail and totals borders overlap without a gap',()=>{
   assert.match(source,/delivery \.lines\{border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
 });
 
-test('delivery totals stay within the 202 mm detail-table width', () => {
-  const fixedWidths = [...source.matchAll(/<col style="width:(\d+(?:\.\d+)?)mm">/g)]
-    .slice(0, 5)
+test('delivery totals stay exactly within the detail-table width', () => {
+  const markup = source.match(/function deliveryTotals[\s\S]*?<\/colgroup>/)[0];
+  const widths = [...markup.matchAll(/<col style="width:(\d+(?:\.\d+)?)%">/g)]
     .map((match) => Number(match[1]));
-  assert.deepEqual(fixedWidths, [66, 6, 43.333, 43.333, 43.334]);
-  assert.equal(fixedWidths.reduce((sum, width) => sum + width, 0), 202);
+  assert.deepEqual(widths, [32.6733, 2.9703, 21.4521, 21.4521, 21.4522]);
+  assert.equal(widths.reduce((sum, width) => sum + width, 0), 100);
   assert.match(source, /writing-mode:vertical-rl/);
 });
 
