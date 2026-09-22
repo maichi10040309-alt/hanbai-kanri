@@ -9,9 +9,10 @@
   const dateParts=value=>{const m=text(value).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);return m?{year:m[1],month:String(Number(m[2])),day:String(Number(m[3])),short:`${m[1].slice(2)}/${m[2].padStart(2,'0')}/${m[3].padStart(2,'0')}`}:{year:'',month:'',day:'',short:text(value)}};
   const chunks=(lines,size)=>{const out=[];for(let i=0;i<lines.length;i+=size)out.push(lines.slice(i,i+size));return out.length?out:[[]]};
   function font(ctx,pt,weight=400){ctx.font=`${weight} ${pt*DPI/72}px "Yu Gothic","Meiryo",sans-serif`;ctx.fillStyle='#000';ctx.textBaseline='top'}
-  function fit(ctx,value,maxWidth){let s=text(value);if(ctx.measureText(s).width<=px(maxWidth))return s;while(s.length&&ctx.measureText(`${s}…`).width>px(maxWidth))s=s.slice(0,-1);return `${s}…`}
-  function left(ctx,value,x,y,width){ctx.textAlign='left';ctx.fillText(fit(ctx,value,width),px(x),px(y))}
-  function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(fit(ctx,value,width-pad*2),px(x+width-pad),px(y))}
+  // Canvas maxWidth keeps the complete string and condenses it only when needed.
+  // Never truncate invoice data or replace its tail with an ellipsis.
+  function left(ctx,value,x,y,width){ctx.textAlign='left';ctx.fillText(text(value),px(x),px(y),px(width))}
+  function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(text(value),px(x+width-pad),px(y),px(width-pad*2))}
   function multiline(ctx,value,x,y,width,lineMm,maxLines){text(value).split(/\r?\n/).slice(0,maxLines).forEach((line,i)=>left(ctx,line,x,y+i*lineMm,width))}
   function imageFrom(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src})}
   async function renderPage(d,co,lines,pageIndex,pageCount){
@@ -30,7 +31,9 @@
     const startX=15,startY=104,rowH=158.4/22;let edges=[startX];columns.forEach(w=>edges.push(edges[edges.length-1]+w));
     for(let i=0;i<22;i++){
       const l=lines[i];if(!l)continue;const y=startY+i*rowH+2.05;const firstDate=l.sourceDate||(!d.periodStart&&i===0?date.short:'');const firstNo=l.sourceNumber||(!d.periodStart&&i===0?d.number:'');
-      font(ctx,9);left(ctx,firstDate,edges[0]+1,y,columns[0]-2);left(ctx,firstNo,edges[1]+1,y,columns[1]-2);left(ctx,[l.code,l.name].filter(Boolean).join(' '),edges[2]+1,y,columns[2]-2);right(ctx,l.qty,edges[3],y,columns[3]);left(ctx,l.unit,edges[4]+1,y,columns[4]-2);right(ctx,money(l.price),edges[5],y,columns[5]);right(ctx,money(l.amount??Number(l.qty)*Number(l.price)),edges[6],y,columns[6]);
+      font(ctx,9);left(ctx,firstDate,edges[0]+1,y,columns[0]-2);left(ctx,firstNo,edges[1]+1,y,columns[1]-2);
+      font(ctx,7.5);left(ctx,l.code,edges[2]+1,startY+i*rowH+0.65,columns[2]-2);left(ctx,l.name,edges[2]+1,startY+i*rowH+3.55,columns[2]-2);
+      font(ctx,9);right(ctx,l.qty,edges[3],y,columns[3]);left(ctx,l.unit,edges[4]+1,y,columns[4]-2);right(ctx,money(l.price),edges[5],y,columns[5]);right(ctx,money(l.amount??Number(l.qty)*Number(l.price)),edges[6],y,columns[6]);
     }
     return canvas.toDataURL('image/jpeg',0.96);
   }

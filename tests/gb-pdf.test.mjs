@@ -26,9 +26,16 @@ test('Japanese text is rasterized by the browser instead of relying on PDF base 
   assert.match(source,/await document\.fonts\.ready/);
 });
 
+test('PDF never truncates values and prints item code and name on separate lines',()=>{
+  assert.doesNotMatch(source,/function fit\(|`\$\{s\}…`/);
+  assert.match(source,/fillText\(text\(value\),px\(x\),px\(y\),px\(width\)\)/);
+  assert.match(source,/font\(ctx,7\.5\);left\(ctx,l\.code/);
+  assert.match(source,/left\(ctx,l\.name,edges\[2\]\+1,startY\+i\*rowH\+3\.55/);
+});
+
 test('summary invoices route to the PDF generator while other forms keep HTML print',()=>{
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260922-1/);
+  assert.match(html,/gb-pdf\.js\?v=20260922-2/);
 });
