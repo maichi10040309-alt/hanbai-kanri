@@ -46,8 +46,8 @@ test('GB1116 uses the formal BP0306/GB1116 positions', () => {
   assert.match(source, /gb1116\{page:gb;width:209\.8mm;height:296\.8mm/);
   assert.match(source, /gb-print-layer\{position:absolute;left:0;top:0;width:209\.8mm;height:296\.8mm;transform:translate\(var\(--gb-x,0mm\),var\(--gb-y,0mm\)\) scale\(var\(--gb-scale,1\)\);transform-origin:top left\}/);
   assert.match(source, /gb-customer\{top:25mm;left:20mm;width:85mm/);
-  assert.match(source, /gb-issuer\{top:17\.5mm;left:135mm;right:auto;width:60mm/);
-  assert.match(source, /company-stamp\{top:18mm;left:171mm;right:auto/);
+  assert.match(source, /gb-issuer\{top:31mm;left:135mm;right:auto;width:60mm/);
+  assert.match(source, /company-stamp\{top:31mm;left:171mm;right:auto/);
   assert.match(source, /gb-bank\{position:absolute;top:60mm;left:70mm/);
   assert.match(source, /gb-summary\{position:absolute;top:76mm;left:15mm;width:180mm/);
   assert.match(source, /gb-detail\{position:absolute;top:104mm;left:15mm;width:180mm;height:158\.4mm/);
@@ -56,8 +56,8 @@ test('GB1116 uses the formal BP0306/GB1116 positions', () => {
 
 test('GB1116 prints dates into the preprinted year month day fields', () => {
   assert.match(source, /function dateParts/);
-  assert.match(source, /gb-date\{top:7\.5mm;left:128mm/);
-  assert.match(source, /gb-no\{top:7\.5mm;left:172mm;right:auto;width:27mm/);
+  assert.match(source, /gb-date\{top:22mm;left:128mm/);
+  assert.match(source, /gb-no\{top:22mm;left:172mm;right:auto;width:27mm/);
   assert.doesNotMatch(source, /gb-no\{[^}]*transform:/);
   assert.doesNotMatch(source, /gb-no\{[^}]*right:-/);
   assert.match(source, /gb-date span:nth-child\(2\)\{left:20mm\}/);
@@ -90,13 +90,16 @@ test('GB1116 right-aligns amounts and includes item codes', () => {
 });
 
 test('GB1116 print scale can compensate for browser or printer fitting', () => {
-  assert.match(source, /scaleKey="gb1116-scale"/);
+  assert.match(source, /scaleKey="gb1116-v32-scale"/);
   assert.match(source, /Math\.max\(90,Math\.min\(110,Number\(localStorage\.getItem\(scaleKey\)\)\|\|100\)\)/);
   assert.match(source, /倍率補正/);
   assert.match(source, /--gb-scale:\$\{isGb\?scale\/100:1\}/);
   assert.match(source, /gb-issuer\{[^}]*font-size:10pt;line-height:1\.4;color:#000/);
   assert.match(source, /gb-bank\{[^}]*font-size:10pt;line-height:1\.4/);
   assert.match(source, /gb-summary span:last-child\{font-size:13pt;font-weight:700;color:#000\}/);
+  assert.match(source, /xKey=isGb\?'gb1116-v32-x':'delivery-x'/);
+  assert.match(source, /yKey=isGb\?'gb1116-v32-y':'delivery-y'/);
+  assert.match(source, /余白は既定／標準・ヘッダーとフッターなし/);
 });
 
 test('GB1116 separates recipient name and honorific', () => {
