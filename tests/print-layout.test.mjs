@@ -42,7 +42,9 @@ test('specialized print templates remain enabled', () => {
 });
 
 test('GB1116 uses the formal BP0306/GB1116 positions', () => {
-  assert.match(source, /gb-print-layer\{position:absolute;inset:0;transform:translate\(var\(--gb-x,0mm\),var\(--gb-y,0mm\)\)\}/);
+  assert.match(source, /@page gb\{size:A4 portrait;margin:0\.1mm\}/);
+  assert.match(source, /gb1116\{page:gb;width:209\.8mm;height:296\.8mm/);
+  assert.match(source, /gb-print-layer\{position:absolute;left:0;top:0;width:209\.8mm;height:296\.8mm;transform:translate\(var\(--gb-x,0mm\),var\(--gb-y,0mm\)\) scale\(var\(--gb-scale,1\)\);transform-origin:top left\}/);
   assert.match(source, /gb-customer\{top:25mm;left:20mm;width:85mm/);
   assert.match(source, /gb-issuer\{top:17\.5mm;left:135mm;right:auto;width:60mm/);
   assert.match(source, /company-stamp\{top:18mm;left:171mm;right:auto/);
@@ -69,7 +71,7 @@ test('GB1116 prints exactly 22 fixed-pitch detail rows', () => {
   assert.match(source, /gb-detail\{[^}]*height:158\.4mm;display:grid;grid-template-rows:repeat\(22,1fr\);box-sizing:border-box/);
   assert.match(source, /gb-row\{width:100%;min-height:0;box-sizing:border-box;display:grid/);
   assert.doesNotMatch(source, /gb-row\{[^}]*height:7\.2mm/);
-  assert.match(source, /gb-row span\{height:100%;min-height:0;min-width:0;padding:0 1mm;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9pt;line-height:1\}/);
+  assert.match(source, /gb-row span\{height:100%;min-height:0;min-width:0;padding:0 1mm;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9\.5pt;line-height:1\}/);
   assert.equal(104 + 7.2 * 22, 262.4);
 });
 
@@ -85,6 +87,16 @@ test('GB1116 right-aligns amounts and includes item codes', () => {
   assert.match(source, /gb-summary span\{[^}]*width:100%[^}]*justify-content:flex-end/);
   assert.match(source, /gb-row \.num\{display:flex;width:100%;justify-self:stretch[^}]*justify-content:flex-end/);
   assert.match(source, /l\.code\?`\$\{safe\(l\.code\)\}<br>`/);
+});
+
+test('GB1116 print scale can compensate for browser or printer fitting', () => {
+  assert.match(source, /scaleKey="gb1116-scale"/);
+  assert.match(source, /Math\.max\(90,Math\.min\(110,Number\(localStorage\.getItem\(scaleKey\)\)\|\|100\)\)/);
+  assert.match(source, /倍率補正/);
+  assert.match(source, /--gb-scale:\$\{isGb\?scale\/100:1\}/);
+  assert.match(source, /gb-issuer\{[^}]*font-size:10pt;line-height:1\.4;color:#000/);
+  assert.match(source, /gb-bank\{[^}]*font-size:10pt;line-height:1\.4/);
+  assert.match(source, /gb-summary span:last-child\{font-size:13pt;font-weight:700;color:#000\}/);
 });
 
 test('GB1116 separates recipient name and honorific', () => {
