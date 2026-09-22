@@ -13,7 +13,7 @@ test('delivery totals use a fixed table instead of a fragile grid', () => {
 test('delivery detail and totals borders overlap without a gap',()=>{
   assert.match(source,/const deliveryLineFix=/);
   assert.match(source,/delivery-totals\{top:124\.88mm/);
-  assert.match(source,/delivery-totals\{top:124\.88mm;border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
+  assert.match(source,/delivery-totals\{top:124\.88mm;left:14mm;width:182mm;border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
   assert.match(source,/\$\{deliveryLineFix\}/);
   assert.match(source,/delivery \.lines\{border-collapse:separate;border-spacing:0;border:1px solid #111\}/);
 });
@@ -64,7 +64,9 @@ test('GB1116 prints dates into the preprinted year month day fields', () => {
 });
 
 test('delivery print position is shifted as one calibrated layer',()=>{
-  assert.match(source,/defaultX=isDelivery\?10\.5:0/);
+  assert.match(source,/delivery \.half\{padding-left:14mm;padding-right:14mm\}/);
+  assert.match(source,/delivery \.lines\{left:14mm;width:182mm\}/);
+  assert.match(source,/delivery \.delivery-totals\{top:124\.88mm;left:14mm;width:182mm/);
   assert.match(source,/\.delivery \.half>\*\{transform:translate\(var\(--delivery-x,0mm\),var\(--delivery-y,0mm\)\)\}/);
   assert.match(source,/localStorage\.setItem\('\$\{xKey\}',this\.value\)/);
 });
