@@ -66,8 +66,10 @@ test('GB1116 prints dates into the preprinted year month day fields', () => {
 test('GB1116 prints exactly 22 fixed-pitch detail rows', () => {
   assert.match(source, /chunks\(d\.lines\|\|\[\],22\)/);
   assert.match(source, /Array\.from\(\{length:22\}/);
-  assert.match(source, /gb-row\{box-sizing:border-box;flex:0 0 7\.2mm;height:7\.2mm/);
-  assert.match(source, /gb-row span\{min-width:0;padding:0 1mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\}/);
+  assert.match(source, /gb-detail\{[^}]*height:158\.4mm;display:grid;grid-template-rows:repeat\(22,1fr\);box-sizing:border-box/);
+  assert.match(source, /gb-row\{width:100%;min-height:0;box-sizing:border-box;display:grid/);
+  assert.doesNotMatch(source, /gb-row\{[^}]*height:7\.2mm/);
+  assert.match(source, /gb-row span\{height:100%;min-height:0;min-width:0;padding:0 1mm;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9pt;line-height:1\}/);
   assert.equal(104 + 7.2 * 22, 262.4);
 });
 
