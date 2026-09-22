@@ -121,7 +121,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
 (function(){
   const originalEditor=window.editor, originalDraw=window.drawLines, originalCalc=window.calc, originalSave=window.saveDoc;
   const kinds=['見積書','納品書','合計請求書','請求書','領収書'];
-  const rows={見積書:17,納品書:6,合計請求書:16,請求書:12,領収書:1};
+  const rows={見積書:17,納品書:6,合計請求書:22,請求書:12,領収書:1};
   const h=x=>esc(x??'');
   const input=(key,label,value='',kind='text')=>`<label class="ve-field"><span>${label}</span><input data-extra="${key}" type="${kind}" value="${h(value)}"></label>`;
   function keepFields(){if(!editing)return;for(const [key,id] of [['type','d-type'],['date','d-date'],['due','d-due'],['customerName','d-customer'],['subject','d-subject'],['note','d-note']]){const el=document.getElementById(id);if(el)editing[key]=el.value}document.querySelectorAll('[data-extra]').forEach(el=>{editing[el.dataset.extra]=el.value})}

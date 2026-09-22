@@ -41,26 +41,34 @@ test('specialized print templates remain enabled', () => {
   assert.match(source, /GB1116（印刷済み用紙）/);
 });
 
-test('GB1116 uses the Rakuda reference positions', () => {
+test('GB1116 uses the formal BP0306/GB1116 positions', () => {
   assert.match(source, /gb-print-layer\{position:absolute;inset:0;transform:translate\(var\(--gb-x,0mm\),var\(--gb-y,0mm\)\)\}/);
-  assert.match(source, /gb-customer\{top:20\.7mm;left:18\.1mm;width:75\.5mm/);
-  assert.match(source, /gb-issuer\{top:29\.2mm;left:124\.7mm;right:auto;width:62mm/);
-  assert.match(source, /company-stamp\{top:26\.2mm;left:167\.2mm;right:auto/);
-  assert.match(source, /gb-bank\{position:absolute;top:57\.7mm;left:70\.4mm/);
-  assert.match(source, /gb-summary\{position:absolute;top:73\.8mm;left:17\.4mm;width:183\.1mm/);
-  assert.match(source, /gb-detail\{top:87\.9mm;left:17\.4mm;width:183\.1mm/);
-  assert.match(source, /grid-template-columns:20\.1mm 12\.9mm 48\.6mm 15\.4mm 10\.1mm 25\.4mm 25\.4mm 25\.2mm/);
+  assert.match(source, /gb-customer\{top:25mm;left:20mm;width:85mm/);
+  assert.match(source, /gb-issuer\{top:17\.5mm;left:135mm;right:auto;width:60mm/);
+  assert.match(source, /company-stamp\{top:18mm;left:171mm;right:auto/);
+  assert.match(source, /gb-bank\{position:absolute;top:60mm;left:70mm/);
+  assert.match(source, /gb-summary\{position:absolute;top:76mm;left:15mm;width:180mm/);
+  assert.match(source, /gb-detail\{position:absolute;top:104mm;left:15mm;width:180mm;height:158\.4mm/);
+  assert.match(source, /grid-template-columns:19\.76mm 12\.68mm 47\.78mm 15\.14mm 9\.93mm 24\.97mm 24\.97mm 24\.77mm/);
 });
 
 test('GB1116 prints dates into the preprinted year month day fields', () => {
   assert.match(source, /function dateParts/);
-  assert.match(source, /gb-date\{top:7\.2mm;left:114\.8mm/);
-  assert.match(source, /gb-no\{top:7\.5mm;left:171\.6mm;right:auto;width:27mm/);
+  assert.match(source, /gb-date\{top:7\.5mm;left:128mm/);
+  assert.match(source, /gb-no\{top:7\.5mm;left:172mm;right:auto;width:27mm/);
   assert.doesNotMatch(source, /gb-no\{[^}]*transform:/);
   assert.doesNotMatch(source, /gb-no\{[^}]*right:-/);
   assert.match(source, /gb-date span:nth-child\(2\)\{left:20mm\}/);
   assert.match(source, /gb-date span:nth-child\(3\)\{left:32mm\}/);
   assert.doesNotMatch(source, /\$\{safe\(d\.number\)\}　\$\{i\+1\}\/\$\{pages\.length\}/);
+});
+
+test('GB1116 prints exactly 22 fixed-pitch detail rows', () => {
+  assert.match(source, /chunks\(d\.lines\|\|\[\],22\)/);
+  assert.match(source, /Array\.from\(\{length:22\}/);
+  assert.match(source, /gb-row\{box-sizing:border-box;flex:0 0 7\.2mm;height:7\.2mm/);
+  assert.match(source, /gb-row span\{min-width:0;padding:0 1mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis\}/);
+  assert.equal(104 + 7.2 * 22, 262.4);
 });
 
 test('delivery print position is shifted as one calibrated layer',()=>{
