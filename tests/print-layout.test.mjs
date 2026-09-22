@@ -42,23 +42,31 @@ test('specialized print templates remain enabled', () => {
 });
 
 test('GB1116 uses the Rakuda reference positions', () => {
-  assert.match(source, /gb-customer\{top:26\.5mm;left:20\.8mm;width:83\.5mm/);
-  assert.match(source, /gb-issuer\{top:34\.3mm;right:9\.2mm;width:62mm/);
-  assert.match(source, /company-stamp\{top:31\.5mm;right:2\.2mm/);
-  assert.match(source, /gb-bank\{position:absolute;top:66\.3mm;left:78\.8mm/);
-  assert.match(source, /gb-summary\{position:absolute;top:86\.1mm;left:17\.8mm;width:182mm/);
-  assert.match(source, /gb-detail\{top:101\.7mm;left:17\.8mm;width:182\.6mm/);
-  assert.match(source, /grid-template-columns:19\.8mm 12\.9mm 48\.3mm 15\.5mm 9\.9mm 25\.4mm 25\.4mm 25\.4mm/);
+  assert.match(source, /gb-print-layer\{position:absolute;inset:0;transform:translate\(var\(--gb-x,0mm\),var\(--gb-y,0mm\)\)\}/);
+  assert.match(source, /gb-customer\{top:20\.7mm;left:18\.1mm;width:75\.5mm/);
+  assert.match(source, /gb-issuer\{top:29\.2mm;left:124\.7mm;right:auto;width:62mm/);
+  assert.match(source, /company-stamp\{top:26\.2mm;left:167\.2mm;right:auto/);
+  assert.match(source, /gb-bank\{position:absolute;top:57\.7mm;left:70\.4mm/);
+  assert.match(source, /gb-summary\{position:absolute;top:73\.8mm;left:17\.4mm;width:183\.1mm/);
+  assert.match(source, /gb-detail\{top:87\.9mm;left:17\.4mm;width:183\.1mm/);
+  assert.match(source, /grid-template-columns:20\.1mm 12\.9mm 48\.6mm 15\.4mm 10\.1mm 25\.4mm 25\.4mm 25\.2mm/);
 });
 
 test('GB1116 prints dates into the preprinted year month day fields', () => {
   assert.match(source, /function dateParts/);
-  assert.match(source, /gb-date\{top:10\.1mm;left:128\.2mm/);
-  assert.match(source, /gb-no\{top:10\.4mm;left:185mm;right:auto;width:23mm[^}]*transform:translate\(0,var\(--gb-y,0mm\)\)/);
+  assert.match(source, /gb-date\{top:7\.2mm;left:114\.8mm/);
+  assert.match(source, /gb-no\{top:7\.5mm;left:171\.6mm;right:auto;width:27mm/);
+  assert.doesNotMatch(source, /gb-no\{[^}]*transform:/);
   assert.doesNotMatch(source, /gb-no\{[^}]*right:-/);
   assert.match(source, /gb-date span:nth-child\(2\)\{left:20mm\}/);
   assert.match(source, /gb-date span:nth-child\(3\)\{left:32mm\}/);
   assert.doesNotMatch(source, /\$\{safe\(d\.number\)\}　\$\{i\+1\}\/\$\{pages\.length\}/);
+});
+
+test('delivery print position is shifted as one calibrated layer',()=>{
+  assert.match(source,/defaultX=isDelivery\?10\.5:0/);
+  assert.match(source,/\.delivery \.half>\*\{transform:translate\(var\(--delivery-x,0mm\),var\(--delivery-y,0mm\)\)\}/);
+  assert.match(source,/localStorage\.setItem\('\$\{xKey\}',this\.value\)/);
 });
 
 test('GB1116 right-aligns amounts and includes item codes', () => {
