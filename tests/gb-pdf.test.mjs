@@ -38,20 +38,20 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-5/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-6/);
 });
 
 test('date fields are centered on the preprint and honorific follows the customer name',()=>{
   assert.match(source,/const nameEnd=20\+ctx\.measureText\(name\)\.width\/MM_TO_PX/);
   assert.match(source,/left\(ctx,suffix,Math\.min\(nameEnd\+2\.5,100\),25,10\)/);
-  assert.match(source,/center\(ctx,date\.year,121\.5,20\.2,14\.2\)/);
-  assert.match(source,/center\(ctx,date\.month,137\.5,20\.2,8\)/);
-  assert.match(source,/center\(ctx,date\.day,149\.7,20\.2,9\)/);
-  assert.match(source,/center\(ctx,d\.number,166\.5,20\.2,27\)/);
+  assert.match(source,/center\(ctx,date\.year,121\.5,24\.2,14\.2\)/);
+  assert.match(source,/center\(ctx,date\.month,137\.5,24\.2,8\)/);
+  assert.match(source,/center\(ctx,date\.day,149\.7,24\.2,9\)/);
+  assert.match(source,/center\(ctx,d\.number,166\.5,24\.2,27\)/);
 });
 
-test('billing summary and current invoice amount print on every PDF page',()=>{
-  assert.doesNotMatch(source,/if\(pageIndex===pageCount-1\)/);
+test('billing summary and current invoice amount print on the first PDF page only',()=>{
+  assert.match(source,/if\(pageIndex===0\)/);
   assert.match(source,/const summary=\[d\.previousBalance,d\.receivedAmount,d\.transferFee,d\.carryForward,d\.sub,d\.tax\]/);
   assert.match(source,/right\(ctx,money\(d\.total\),172\.6,80\.2,27\.9\)/);
 });
