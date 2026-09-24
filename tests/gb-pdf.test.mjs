@@ -38,7 +38,16 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260922-3/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-4/);
+});
+
+test('date fields are centered on the preprint and honorific follows the customer name',()=>{
+  assert.match(source,/const nameEnd=20\+ctx\.measureText\(name\)\.width\/MM_TO_PX/);
+  assert.match(source,/left\(ctx,suffix,Math\.min\(nameEnd\+2\.5,100\),25,10\)/);
+  assert.match(source,/center\(ctx,date\.year,121\.5,22,14\.2\)/);
+  assert.match(source,/center\(ctx,date\.month,137\.5,22,8\)/);
+  assert.match(source,/center\(ctx,date\.day,149\.7,22,9\)/);
+  assert.match(source,/center\(ctx,d\.number,166\.5,22,27\)/);
 });
 
 test('alignment PDF overlays the scanned BP0306 template without affecting normal print',()=>{

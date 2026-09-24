@@ -13,6 +13,7 @@
   // Canvas maxWidth keeps the complete string and condenses it only when needed.
   // Never truncate invoice data or replace its tail with an ellipsis.
   function left(ctx,value,x,y,width){ctx.textAlign='left';ctx.fillText(text(value),px(x),px(y),px(width))}
+  function center(ctx,value,x,y,width){ctx.textAlign='center';ctx.fillText(text(value),px(x+width/2),px(y),px(width))}
   function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(text(value),px(x+width-pad),px(y),px(width-pad*2))}
   function multiline(ctx,value,x,y,width,lineMm,maxLines){text(value).split(/\r?\n/).slice(0,maxLines).forEach((line,i)=>left(ctx,line,x,y+i*lineMm,width))}
   function imageFrom(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src})}
@@ -21,8 +22,8 @@
     const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=true;
     if(templateImage)ctx.drawImage(templateImage,0,0,canvas.width,canvas.height);
     const date=dateParts(d.date),label=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName),match=label.match(/^(.*?)(様|御中)$/),name=match?match[1].trim():label,suffix=match?match[2]:'';
-    font(ctx,11);left(ctx,name,20,25,72);ctx.textAlign='right';ctx.fillText(suffix,px(103),px(25));
-    font(ctx,9);left(ctx,date.year,128,22,18);left(ctx,date.month,148,22,10);left(ctx,date.day,160,22,10);left(ctx,d.number,172,22,27);
+    font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX;left(ctx,suffix,Math.min(nameEnd+2.5,100),25,10);
+    font(ctx,9);center(ctx,date.year,121.5,22,14.2);center(ctx,date.month,137.5,22,8);center(ctx,date.day,149.7,22,9);center(ctx,d.number,166.5,22,27);
     font(ctx,8.5);multiline(ctx,[co.name,co.postal?`〒${co.postal}`:'',co.address,co.tel?`TEL. ${co.tel}${co.fax?`  FAX. ${co.fax}`:''}`:'',co.invoiceNo?`登録番号：${co.invoiceNo}`:''].filter(Boolean).join('\n'),135,31,58,3.9,5);
     if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const img=await imageFrom(co.stamp);ctx.drawImage(img,px(171),px(31),px(22),px(22))}catch(_){}}
     font(ctx,8.5);multiline(ctx,co.bank||'',70,60,105,3.9,4);
