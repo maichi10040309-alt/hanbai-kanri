@@ -23,15 +23,13 @@
     if(templateImage)ctx.drawImage(templateImage,0,0,canvas.width,canvas.height);
     const date=dateParts(d.date),label=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName),match=label.match(/^(.*?)(様|御中)$/),name=match?match[1].trim():label,suffix=match?match[2]:'';
     font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX;left(ctx,suffix,Math.min(nameEnd+2.5,100),25,10);
-    font(ctx,9);center(ctx,date.year,121.5,22,14.2);center(ctx,date.month,137.5,22,8);center(ctx,date.day,149.7,22,9);center(ctx,d.number,166.5,22,27);
+    font(ctx,9);center(ctx,date.year,121.5,20.2,14.2);center(ctx,date.month,137.5,20.2,8);center(ctx,date.day,149.7,20.2,9);center(ctx,d.number,166.5,20.2,27);
     font(ctx,8.5);multiline(ctx,[co.name,co.postal?`〒${co.postal}`:'',co.address,co.tel?`TEL. ${co.tel}${co.fax?`  FAX. ${co.fax}`:''}`:'',co.invoiceNo?`登録番号：${co.invoiceNo}`:''].filter(Boolean).join('\n'),135,31,58,3.9,5);
     if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const img=await imageFrom(co.stamp);ctx.drawImage(img,px(171),px(31),px(22),px(22))}catch(_){}}
     font(ctx,8.5);multiline(ctx,co.bank||'',70,60,105,3.9,4);
-    if(pageIndex===pageCount-1){
-      const summary=[d.previousBalance,d.receivedAmount,d.transferFee,d.carryForward,d.sub,d.tax],summaryX=[17.2,42.7,68.1,93.6,119.1,144.5];
-      summary.forEach((value,i)=>{font(ctx,9);right(ctx,value==null||value===''?'':money(value),summaryX[i],80.2,25.4)});
-      font(ctx,11,700);right(ctx,money(d.total),172.6,80.2,27.9);
-    }
+    const summary=[d.previousBalance,d.receivedAmount,d.transferFee,d.carryForward,d.sub,d.tax],summaryX=[17.2,42.7,68.1,93.6,119.1,144.5];
+    summary.forEach((value,i)=>{font(ctx,9);right(ctx,value==null||value===''?'':money(value),summaryX[i],80.2,25.4)});
+    font(ctx,11,700);right(ctx,money(d.total),172.6,80.2,27.9);
     const startX=17.1,startY=93.7,rowH=(284.4-93.7)/22;let edges=[startX];columns.forEach(w=>edges.push(edges[edges.length-1]+w));
     for(let i=0;i<22;i++){
       const l=lines[i];if(!l)continue;const y=startY+i*rowH+2.05;const firstDate=l.sourceDate||(!d.periodStart&&i===0?date.short:'');const firstNo=l.sourceNumber||(!d.periodStart&&i===0?d.number:'');
