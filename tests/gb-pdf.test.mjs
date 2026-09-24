@@ -5,6 +5,7 @@ import { readFileSync, statSync } from 'node:fs';
 const source=readFileSync(new URL('../gb-pdf.js',import.meta.url),'utf8');
 const printSource=readFileSync(new URL('../print-templates.js',import.meta.url),'utf8');
 const appSource=readFileSync(new URL('../app.js',import.meta.url),'utf8');
+const settingsSource=readFileSync(new URL('../company-settings.js',import.meta.url),'utf8');
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 
 test('GB1116 uses an A4 PDF generated at fixed physical size',()=>{
@@ -38,7 +39,17 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-8/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-9/);
+});
+
+test('company and bank information use the requested coordinates and typography',()=>{
+  assert.match(source,/font\(ctx,9\.5\);left\(ctx,co\.name,125,34,70\)/);
+  assert.match(source,/multiline\(ctx,\[co\.postal[\s\S]*\.join\('\\n'\),125,39,70,3\.9,5\)/);
+  assert.match(source,/contact\?`担当：\$\{contact\}`:''/);
+  assert.match(source,/font\(ctx,9\.5\);multiline\(ctx,co\.bank\|\|'',71,60,105,4\.2,4\)/);
+  assert.match(settingsSource,/id="s-contact"/);
+  assert.match(settingsSource,/db\.company\.contactPerson=contactPerson/);
+  assert.match(html,/company-settings\.js\?v=20260924-2/);
 });
 
 test('date and invoice number use their requested physical anchors and honorific follows the customer name',()=>{

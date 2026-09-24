@@ -24,9 +24,11 @@
     const date=dateParts(d.date),label=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName),match=label.match(/^(.*?)(様|御中)$/),name=match?match[1].trim():label,suffix=match?match[2]:'';
     font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX;left(ctx,suffix,Math.min(nameEnd+2.5,100),25,10);
     font(ctx,9);left(ctx,date.year,115,18,14);center(ctx,date.month,130,18,8);center(ctx,date.day,142,18,9);left(ctx,d.number,184,18,24);
-    font(ctx,8.5);multiline(ctx,[co.name,co.postal?`〒${co.postal}`:'',co.address,co.tel?`TEL. ${co.tel}${co.fax?`  FAX. ${co.fax}`:''}`:'',co.invoiceNo?`登録番号：${co.invoiceNo}`:''].filter(Boolean).join('\n'),135,31,58,3.9,5);
+    font(ctx,9.5);left(ctx,co.name,125,34,70);
+    const contact=co.contactPerson||co.contact||co.person||'';
+    font(ctx,8.5);multiline(ctx,[co.postal?`〒${co.postal}`:'',co.address,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',co.invoiceNo?`登録番号：${co.invoiceNo}`:'',contact?`担当：${contact}`:''].filter(Boolean).join('\n'),125,39,70,3.9,5);
     if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const img=await imageFrom(co.stamp);ctx.drawImage(img,px(171),px(31),px(22),px(22))}catch(_){}}
-    font(ctx,8.5);multiline(ctx,co.bank||'',70,60,105,3.9,4);
+    font(ctx,9.5);multiline(ctx,co.bank||'',71,60,105,4.2,4);
     if(pageIndex===0){
       const summary=[d.previousBalance,d.receivedAmount,d.transferFee,d.carryForward,d.sub,d.tax],summaryX=[17.2,42.7,68.1,93.6,119.1,144.5];
       summary.forEach((value,i)=>{font(ctx,9);right(ctx,value==null||value===''?'':money(value),summaryX[i],80.2,25.4)});
