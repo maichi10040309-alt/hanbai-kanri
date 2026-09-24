@@ -23,7 +23,7 @@ test('GB1116 PDF preserves the formal eight-column 22-row geometry',()=>{
 });
 
 test('Japanese text is rasterized by the browser instead of relying on PDF base fonts',()=>{
-  assert.match(source,/"Yu Gothic","Meiryo",sans-serif/);
+  assert.match(source,/"MS Mincho","ＭＳ 明朝","Yu Mincho",serif/);
   assert.match(source,/canvas\.toDataURL\('image\/jpeg',0\.96\)/);
   assert.match(source,/await document\.fonts\.ready/);
 });
@@ -39,13 +39,23 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-10/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-11/);
 });
 
 test('customer code prints at the requested 40mm by 57mm position',()=>{
   assert.match(source,/async function renderPage\(d,c,co,lines,pageIndex,pageCount,templateImage\)/);
   assert.match(source,/font\(ctx,9\);left\(ctx,c\?\.code\|\|'',40,57,30\)/);
   assert.match(source,/renderPage\(d,c\|\|\{\},co\|\|\{\},pages\[i\]/);
+});
+
+test('source voucher date begins 21mm from the left edge',()=>{
+  assert.match(source,/left\(ctx,firstDate,21,y,columns\[0\]-\(21-startX\)-1\)/);
+});
+
+test('print views request Rakuda-style Mincho typography and show driver settings',()=>{
+  assert.match(printSource,/font-family:'MS Mincho','ＭＳ 明朝','Yu Mincho',serif/);
+  assert.match(printSource,/カラー・手差し給紙・倍率100%/);
+  assert.match(source,/カラー」「手差し給紙」「実際のサイズ（100%）/);
 });
 
 test('company and bank information use the requested coordinates and typography',()=>{

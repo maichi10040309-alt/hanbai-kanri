@@ -9,7 +9,7 @@
   const money=x=>typeof yen==='function'?yen(x):`¥${Math.round(Number(x)||0).toLocaleString('ja-JP')}`;
   const dateParts=value=>{const m=text(value).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);return m?{year:m[1],month:String(Number(m[2])),day:String(Number(m[3])),short:`${m[1].slice(2)}/${m[2].padStart(2,'0')}/${m[3].padStart(2,'0')}`}:{year:'',month:'',day:'',short:text(value)}};
   const chunks=(lines,size)=>{const out=[];for(let i=0;i<lines.length;i+=size)out.push(lines.slice(i,i+size));return out.length?out:[[]]};
-  function font(ctx,pt,weight=400){ctx.font=`${weight} ${pt*DPI/72}px "Yu Gothic","Meiryo",sans-serif`;ctx.fillStyle='#000';ctx.textBaseline='top'}
+  function font(ctx,pt,weight=400){ctx.font=`${weight} ${pt*DPI/72}px "MS Mincho","ＭＳ 明朝","Yu Mincho",serif`;ctx.fillStyle='#000';ctx.textBaseline='top'}
   // Canvas maxWidth keeps the complete string and condenses it only when needed.
   // Never truncate invoice data or replace its tail with an ellipsis.
   function left(ctx,value,x,y,width){ctx.textAlign='left';ctx.fillText(text(value),px(x),px(y),px(width))}
@@ -38,7 +38,7 @@
     const startX=17.1,startY=93.7,rowH=(284.4-93.7)/22;let edges=[startX];columns.forEach(w=>edges.push(edges[edges.length-1]+w));
     for(let i=0;i<22;i++){
       const l=lines[i];if(!l)continue;const y=startY+i*rowH+2.05;const firstDate=l.sourceDate||(!d.periodStart&&i===0?date.short:'');const firstNo=l.sourceNumber||(!d.periodStart&&i===0?d.number:'');
-      font(ctx,9);left(ctx,firstDate,edges[0]+1,y,columns[0]-2);left(ctx,firstNo,edges[1]+1,y,columns[1]-2);
+      font(ctx,9);left(ctx,firstDate,21,y,columns[0]-(21-startX)-1);left(ctx,firstNo,edges[1]+1,y,columns[1]-2);
       font(ctx,7.5);left(ctx,l.code,edges[2]+1,startY+i*rowH+0.65,columns[2]-2);left(ctx,l.name,edges[2]+1,startY+i*rowH+3.55,columns[2]-2);
       font(ctx,9);right(ctx,l.qty,edges[3],y,columns[3]);left(ctx,l.unit,edges[4]+1,y,columns[4]-2);right(ctx,money(l.price),edges[5],y,columns[5]);right(ctx,money(l.amount??Number(l.qty)*Number(l.price)),edges[6],y,columns[6]);
     }
@@ -46,7 +46,7 @@
   }
   window.printGbPdf=async function(d,c,co,options={}){
     if(!window.jspdf?.jsPDF){alert('PDF生成機能を読み込めませんでした。ページを再読み込みしてください。');return}
-    const preview=window.open('','_blank');if(!preview){alert('PDFを開けません。ポップアップを許可してください。');return}preview.document.write('<p style="font-family:sans-serif">実寸PDFを生成しています…</p>');
+    const preview=window.open('','_blank');if(!preview){alert('PDFを開けません。ポップアップを許可してください。');return}preview.document.write('<p style="font-family:serif">実寸PDFを生成しています…<br>印刷設定は「カラー」「手差し給紙」「実際のサイズ（100%）」を選択してください。</p>');
     try{await document.fonts.ready;const pages=chunks(d.lines||[],22),templateImage=options.showTemplate?await imageFrom('assets/bp0306-template.jpg?v=20260924-1'):null;const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true,putOnlyUsedFonts:true});
       for(let i=0;i<pages.length;i++){if(i)pdf.addPage('a4','portrait');const image=await renderPage(d,c||{},co||{},pages[i],i,pages.length,templateImage);pdf.addImage(image,'JPEG',0,0,PAGE_W,PAGE_H,undefined,'FAST')}
       const url=URL.createObjectURL(pdf.output('blob'));preview.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),300000);
