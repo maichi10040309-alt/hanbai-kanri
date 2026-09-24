@@ -38,16 +38,16 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-6/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-7/);
 });
 
-test('date fields are centered on the preprint and honorific follows the customer name',()=>{
+test('date fields use the requested 115mm by 20mm anchor and honorific follows the customer name',()=>{
   assert.match(source,/const nameEnd=20\+ctx\.measureText\(name\)\.width\/MM_TO_PX/);
   assert.match(source,/left\(ctx,suffix,Math\.min\(nameEnd\+2\.5,100\),25,10\)/);
-  assert.match(source,/center\(ctx,date\.year,121\.5,24\.2,14\.2\)/);
-  assert.match(source,/center\(ctx,date\.month,137\.5,24\.2,8\)/);
-  assert.match(source,/center\(ctx,date\.day,149\.7,24\.2,9\)/);
-  assert.match(source,/center\(ctx,d\.number,166\.5,24\.2,27\)/);
+  assert.match(source,/left\(ctx,date\.year,115,20,14\)/);
+  assert.match(source,/center\(ctx,date\.month,130,20,8\)/);
+  assert.match(source,/center\(ctx,date\.day,142,20,9\)/);
+  assert.match(source,/center\(ctx,d\.number,166\.5,20,27\)/);
 });
 
 test('billing summary and current invoice amount print on the first PDF page only',()=>{
