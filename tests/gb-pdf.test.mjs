@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 
 const source=readFileSync(new URL('../gb-pdf.js',import.meta.url),'utf8');
 const printSource=readFileSync(new URL('../print-templates.js',import.meta.url),'utf8');
+const appSource=readFileSync(new URL('../app.js',import.meta.url),'utf8');
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 
 test('GB1116 uses an A4 PDF generated at fixed physical size',()=>{
@@ -14,10 +15,10 @@ test('GB1116 uses an A4 PDF generated at fixed physical size',()=>{
 });
 
 test('GB1116 PDF preserves the formal eight-column 22-row geometry',()=>{
-  assert.match(source,/columns=\[19\.76,12\.68,47\.78,15\.14,9\.93,24\.97,24\.97,24\.77\]/);
-  assert.match(source,/const startX=15,startY=104,rowH=158\.4\/22/);
+  assert.match(source,/columns=\[20\.4,12\.8,48\.3,15\.4,10,25\.5,25\.5,25\.4\]/);
+  assert.match(source,/const startX=17\.1,startY=93\.7,rowH=\(284\.4-93\.7\)\/22/);
   assert.match(source,/for\(let i=0;i<22;i\+\+\)/);
-  assert.equal([19.76,12.68,47.78,15.14,9.93,24.97,24.97,24.77].reduce((a,b)=>a+b,0),180);
+  assert.ok(Math.abs([20.4,12.8,48.3,15.4,10,25.5,25.5,25.4].reduce((a,b)=>a+b,0)-183.3)<1e-9);
 });
 
 test('Japanese text is rasterized by the browser instead of relying on PDF base fonts',()=>{
@@ -37,5 +38,15 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260922-2/);
+  assert.match(html,/gb-pdf\.js\?v=20260922-3/);
+});
+
+test('alignment PDF overlays the scanned BP0306 template without affecting normal print',()=>{
+  assert.match(source,/options\.showTemplate/);
+  assert.match(source,/assets\/bp0306-template\.jpg\?v=20260924-1/);
+  assert.match(source,/if\(templateImage\)ctx\.drawImage\(templateImage,0,0,canvas\.width,canvas\.height\)/);
+  assert.match(printSource,/window\.printGbTemplate/);
+  assert.match(printSource,/\{showTemplate:true\}/);
+  assert.match(appSource,/位置合わせPDF/);
+  assert.ok(statSync(new URL('../assets/bp0306-template.jpg',import.meta.url)).size>100000);
 });
