@@ -39,7 +39,7 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-11/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-12/);
 });
 
 test('customer code prints at the requested 40mm by 57mm position',()=>{
@@ -69,8 +69,9 @@ test('company and bank information use the requested coordinates and typography'
 });
 
 test('date and invoice number use their requested physical anchors and honorific follows the customer name',()=>{
-  assert.match(source,/const nameEnd=20\+ctx\.measureText\(name\)\.width\/MM_TO_PX/);
-  assert.match(source,/left\(ctx,suffix,Math\.min\(nameEnd\+2\.5,100\),25,10\)/);
+  assert.match(source,/const nameEnd=20\+ctx\.measureText\(name\)\.width\/MM_TO_PX,suffixX=Math\.min\(nameEnd\+2\.5,100\)/);
+  assert.match(source,/const recipientEnd=suffix\?suffixX\+ctx\.measureText\(suffix\)\.width\/MM_TO_PX:nameEnd/);
+  assert.match(source,/ctx\.moveTo\(px\(20\),px\(30\)\);ctx\.lineTo\(px\(recipientEnd\),px\(30\)\)/);
   assert.match(source,/left\(ctx,date\.year,115,18,14\)/);
   assert.match(source,/center\(ctx,date\.month,130,18,8\)/);
   assert.match(source,/center\(ctx,date\.day,142,18,9\)/);

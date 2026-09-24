@@ -22,7 +22,7 @@
     const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=true;
     if(templateImage)ctx.drawImage(templateImage,0,0,canvas.width,canvas.height);
     const date=dateParts(d.date),label=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName),match=label.match(/^(.*?)(様|御中)$/),name=match?match[1].trim():label,suffix=match?match[2]:'';
-    font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX;left(ctx,suffix,Math.min(nameEnd+2.5,100),25,10);
+    font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX,suffixX=Math.min(nameEnd+2.5,100);left(ctx,suffix,suffixX,25,10);const recipientEnd=suffix?suffixX+ctx.measureText(suffix).width/MM_TO_PX:nameEnd;ctx.beginPath();ctx.moveTo(px(20),px(30));ctx.lineTo(px(recipientEnd),px(30));ctx.lineWidth=Math.max(1,px(0.2));ctx.strokeStyle='#000';ctx.stroke();
     font(ctx,9);left(ctx,c?.code||'',40,57,30);
     font(ctx,9);left(ctx,date.year,115,18,14);center(ctx,date.month,130,18,8);center(ctx,date.day,142,18,9);left(ctx,d.number,184,18,24);
     font(ctx,9.5);left(ctx,co.name,125,34,70);
