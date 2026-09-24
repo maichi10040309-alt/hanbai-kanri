@@ -24,6 +24,9 @@ test('delivery lines match the six printed columns',()=>{
   assert.match(app,/const columns=editing\.type==='納品書'\?6:8/);
   assert.match(app,/heads\[1\]\.textContent='品 番 ・ 品 名'/);
   assert.match(css,/\.delivery-edit-lines \.line-table th:nth-child\(1\)\{width:42%\}/);
+  assert.match(css,/\.delivery-item-inputs\{display:grid;grid-template-columns:1fr;grid-template-rows:1fr 1fr/);
+  assert.match(css,/\.delivery-item-inputs input:first-child\{border-bottom:1px solid #777!important\}/);
+  assert.doesNotMatch(css,/delivery-item-inputs input:first-child\{border-right/);
 });
 
 test('delivery editor mirrors printed header and totals layout',()=>{
