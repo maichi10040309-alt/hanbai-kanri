@@ -17,12 +17,13 @@
   function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(text(value),px(x+width-pad),px(y),px(width-pad*2))}
   function multiline(ctx,value,x,y,width,lineMm,maxLines){text(value).split(/\r?\n/).slice(0,maxLines).forEach((line,i)=>left(ctx,line,x,y+i*lineMm,width))}
   function imageFrom(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src})}
-  async function renderPage(d,co,lines,pageIndex,pageCount,templateImage){
+  async function renderPage(d,c,co,lines,pageIndex,pageCount,templateImage){
     const canvas=document.createElement('canvas');canvas.width=Math.round(px(PAGE_W));canvas.height=Math.round(px(PAGE_H));
     const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=true;
     if(templateImage)ctx.drawImage(templateImage,0,0,canvas.width,canvas.height);
     const date=dateParts(d.date),label=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName),match=label.match(/^(.*?)(様|御中)$/),name=match?match[1].trim():label,suffix=match?match[2]:'';
     font(ctx,11);left(ctx,name,20,25,72);const nameEnd=20+ctx.measureText(name).width/MM_TO_PX;left(ctx,suffix,Math.min(nameEnd+2.5,100),25,10);
+    font(ctx,9);left(ctx,c?.code||'',40,57,30);
     font(ctx,9);left(ctx,date.year,115,18,14);center(ctx,date.month,130,18,8);center(ctx,date.day,142,18,9);left(ctx,d.number,184,18,24);
     font(ctx,9.5);left(ctx,co.name,125,34,70);
     const contact=co.contactPerson||co.contact||co.person||'';
@@ -47,7 +48,7 @@
     if(!window.jspdf?.jsPDF){alert('PDF生成機能を読み込めませんでした。ページを再読み込みしてください。');return}
     const preview=window.open('','_blank');if(!preview){alert('PDFを開けません。ポップアップを許可してください。');return}preview.document.write('<p style="font-family:sans-serif">実寸PDFを生成しています…</p>');
     try{await document.fonts.ready;const pages=chunks(d.lines||[],22),templateImage=options.showTemplate?await imageFrom('assets/bp0306-template.jpg?v=20260924-1'):null;const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true,putOnlyUsedFonts:true});
-      for(let i=0;i<pages.length;i++){if(i)pdf.addPage('a4','portrait');const image=await renderPage(d,co||{},pages[i],i,pages.length,templateImage);pdf.addImage(image,'JPEG',0,0,PAGE_W,PAGE_H,undefined,'FAST')}
+      for(let i=0;i<pages.length;i++){if(i)pdf.addPage('a4','portrait');const image=await renderPage(d,c||{},co||{},pages[i],i,pages.length,templateImage);pdf.addImage(image,'JPEG',0,0,PAGE_W,PAGE_H,undefined,'FAST')}
       const url=URL.createObjectURL(pdf.output('blob'));preview.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),300000);
     }catch(error){preview.close();console.error(error);alert('PDFの生成に失敗しました。')}
   };

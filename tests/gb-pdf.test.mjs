@@ -39,7 +39,13 @@ test('summary invoices route to the PDF generator while other forms keep HTML pr
   assert.match(printSource,/d\.type==='合計請求書'&&typeof window\.printGbPdf==='function'/);
   assert.match(printSource,/window\.printGbPdf\(d,c,co\);return/);
   assert.match(html,/vendor\/jspdf\.umd\.min\.js\?v=2\.5\.2/);
-  assert.match(html,/gb-pdf\.js\?v=20260924-9/);
+  assert.match(html,/gb-pdf\.js\?v=20260924-10/);
+});
+
+test('customer code prints at the requested 40mm by 57mm position',()=>{
+  assert.match(source,/async function renderPage\(d,c,co,lines,pageIndex,pageCount,templateImage\)/);
+  assert.match(source,/font\(ctx,9\);left\(ctx,c\?\.code\|\|'',40,57,30\)/);
+  assert.match(source,/renderPage\(d,c\|\|\{\},co\|\|\{\},pages\[i\]/);
 });
 
 test('company and bank information use the requested coordinates and typography',()=>{
