@@ -170,8 +170,8 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
   const rows={見積書:17,納品書:6,合計請求書:22,請求書:12,領収書:1};
   const h=x=>esc(x??'');
   const input=(key,label,value='',kind='text')=>`<label class="ve-field"><span>${label}</span><input data-extra="${key}" type="${kind}" value="${h(value)}"></label>`;
-  const blankDeliveryLine=()=>({id:id(),code:'',name:'',qty:1,unit:'個',price:0,tax:10});
-  const emptyDeliveryLine=l=>!String(l.code||'').trim()&&!String(l.name||'').trim()&&Number(l.qty)===1&&l.unit==='個'&&Number(l.price)===0&&Number(l.tax)===10;
+  const blankDeliveryLine=()=>({id:id(),code:'',name:'',note:'',qty:1,unit:'個',price:0,tax:10});
+  const emptyDeliveryLine=l=>!String(l.code||'').trim()&&!String(l.name||'').trim()&&!String(l.note||'').trim()&&Number(l.qty)===1&&l.unit==='個'&&Number(l.price)===0&&Number(l.tax)===10;
   function padDeliveryRows(){if(editing?.type!=='納品書')return;const count=Math.max(6,Math.ceil(editing.lines.length/6)*6);while(editing.lines.length<count)editing.lines.push(blankDeliveryLine())}
   function registerDeliveryProducts(){
     if(editing?.type!=='納品書')return;
@@ -190,7 +190,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
   }
   function shapeDeliveryLines(table){
     if(!table)return;const heads=[...table.querySelectorAll('thead th')];if(heads.length===8){heads[1].textContent='品 番 ・ 品 名';heads[7].textContent='備 考';heads[0].remove();heads[5].remove()}
-    table.querySelectorAll('tbody tr[data-line]').forEach(row=>{const cells=[...row.children];if(cells.length!==8)return;const code=cells[0].querySelector('input'),codeList=cells[0].querySelector('datalist'),name=cells[1].querySelector('input'),tax=cells[5].querySelector('select'),actions=cells[7],itemWrap=document.createElement('div');code.placeholder='品番';name.placeholder='品名';itemWrap.className='delivery-item-inputs';itemWrap.append(code,name);if(codeList)itemWrap.append(codeList);cells[1].classList.add('delivery-item-cell');cells[1].append(itemWrap);tax.title='税率';tax.classList.add('delivery-tax');actions.prepend(tax);cells[0].remove();cells[5].remove()});
+    table.querySelectorAll('tbody tr[data-line]').forEach(row=>{const cells=[...row.children];if(cells.length!==8)return;const index=Number(row.dataset.line),code=cells[0].querySelector('input'),codeList=cells[0].querySelector('datalist'),name=cells[1].querySelector('input'),tax=cells[5].querySelector('select'),actions=cells[7],itemWrap=document.createElement('div'),priceWrap=document.createElement('div');code.placeholder='品番';name.placeholder='品名';itemWrap.className='delivery-item-inputs';itemWrap.append(code,name);if(codeList)itemWrap.append(codeList);cells[1].classList.add('delivery-item-cell');cells[1].append(itemWrap);priceWrap.className='delivery-price-inputs';priceWrap.append(cells[4].querySelector('input'),tax);cells[4].append(priceWrap);tax.title='税率';tax.classList.add('delivery-tax');const note=document.createElement('input');note.type='text';note.className='delivery-note';note.placeholder='備考';note.setAttribute('aria-label','備考');note.value=editing.lines[index].note||'';note.addEventListener('input',()=>{editing.lines[index].note=note.value});actions.prepend(note);cells[0].remove();cells[5].remove()});
   }
   function decorateLines(){
     const body=document.getElementById('lines');if(!body||!editing)return;

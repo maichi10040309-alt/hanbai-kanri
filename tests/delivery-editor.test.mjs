@@ -29,11 +29,18 @@ test('delivery lines match the six printed columns',()=>{
   assert.match(css,/\.delivery-item-inputs input:first-child\{border-bottom:1px solid #777!important\}/);
   assert.doesNotMatch(css,/delivery-item-inputs input:first-child\{border-right/);
 });
+test('delivery remarks are editable and tax is placed with unit price',()=>{
+  assert.match(app,/note\.placeholder='備考'/);
+  assert.match(app,/note\.addEventListener\('input',\(\)=>\{editing\.lines\[index\]\.note=note\.value\}\)/);
+  assert.match(app,/priceWrap\.append\(cells\[4\]\.querySelector\('input'\),tax\)/);
+  assert.match(app,/actions\.prepend\(note\)/);
+  assert.match(css,/\.delivery-edit-lines \.delivery-note\{width:calc\(100% - 22px\)/);
+});
 
 test('all six delivery rows are editable and retain the product-code list',()=>{
   assert.match(app,/function padDeliveryRows\(\).*Math\.ceil\(editing\.lines\.length\/6\)\*6/);
   assert.match(app,/window\.addLine=function\(\).*for\(let i=0;i<6;i\+\+\)editing\.lines\.push\(blankDeliveryLine\(\)\)/);
-  assert.match(app,/const code=cells\[0\]\.querySelector\('input'\),codeList=cells\[0\]\.querySelector\('datalist'\)/);
+  assert.match(app,/code=cells\[0\]\.querySelector\('input'\),codeList=cells\[0\]\.querySelector\('datalist'\)/);
   assert.match(app,/if\(codeList\)itemWrap\.append\(codeList\)/);
   assert.match(app,/window\.drawLines=function\(\)\{padDeliveryRows\(\);originalDraw\(\);decorateLines\(\)\}/);
 });
