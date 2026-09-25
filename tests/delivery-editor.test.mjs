@@ -81,14 +81,14 @@ test('delivery editor text remains readable against the ruled form',()=>{
 
 test('product code candidates filter the code field and fill the selected product',()=>{
   assert.match(app,/data-field="code" list="product-code-list"[^`]*onchange="pickProductCode/);
-  assert.match(app,/function productCodeOptions\(\)/);
+  assert.match(app,/function productCodeOptions\(query=''/);
   const fields=Object.fromEntries(['code','name','unit','price','tax'].map(key=>[key,{value:''}]));
   const row={querySelector(selector){return fields[selector.match(/data-field="([^"]+)"/)?.[1]]||{textContent:''}}};
   const context={
     db:{products:[{code:'A0724',name:'いちばんパンツ',unit:'袋',price:1550,tax:10},{code:'B008',name:'包帯',unit:'個',price:300,tax:8}]},
     editing:{lines:[{code:'',name:'',qty:1,unit:'個',price:0,tax:10}],type:'納品書'},
     document:{querySelector(selector){return selector==='#totals'?{set innerHTML(value){}}:row}},
-    esc:String,yen:String,calc(){}
+    esc:String,yen:String,calc(){},preferredProducts(){return context.db.products},productKey:s=>String(s||'').toLowerCase()
   };
   const start=app.indexOf('function kanaKey('),end=app.indexOf('function taxByRate(',start);
   vm.runInNewContext(app.slice(start,end),context);
