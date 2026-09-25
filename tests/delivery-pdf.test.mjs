@@ -32,9 +32,9 @@ test('date, two-line item, and amounts follow the supplied form coordinates',()=
   assert.match(source,/left\(ctx,l\.unit,118,y\+2\.3,13\)/);
   assert.match(source,/left\(ctx,l\.note,178,y\+2\.3,27\)/);
   assert.match(source,/right\(ctx,plainMoney\(l\.price\),129,y\+2\.3,24\)/);
-  assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,35\)/);
-  assert.match(source,/right\(ctx,plainMoney\(d\.tax\),115,128\+baseY,35\)/);
-  assert.match(source,/right\(ctx,plainMoney\(d\.total\),157,128\+baseY,44\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,30\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.tax\),115,128\+baseY,42\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.total\),157,128\+baseY,48\)/);
   assert.doesNotMatch(source,/right\(ctx,money\(d\.total\)/);
 });
 
@@ -42,7 +42,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-8/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-9/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -56,4 +56,9 @@ test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
 test('clean A4 title fits inside each header and date prints full Japanese units',()=>{
   assert.match(source,/font\(ctx,13,700\);ctx\.textAlign='center'/);
   assert.match(source,/\$\{year\}年 \$\{month\}月 \$\{day\}日/);
+});
+
+test('clean A4 form is centered and subtotal stays in its 85–115mm cell',()=>{
+  assert.match(source,/if\(!template\)ctx\.translate\(px\(\(PAGE_W-186\.5\)\/2-18\.5\),0\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,30\)/);
 });

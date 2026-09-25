@@ -29,6 +29,8 @@
   async function renderPage(d,c,co,lines,pageIndex,pageCount,template){
     const canvas=document.createElement('canvas');canvas.width=Math.round(px(PAGE_W));canvas.height=Math.round(px(PAGE_H));
     const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);if(template)ctx.drawImage(template,0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=true;ink=template?'#d00000':'#000';
+    // The clean form spans x=18.5..205mm. Center its 186.5mm width on A4.
+    if(!template)ctx.translate(px((PAGE_W-186.5)/2-18.5),0);
     const recipient=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName);
     for(const baseY of [0,148.5]){
       if(!template)blankForm(ctx,baseY);
@@ -46,7 +48,7 @@
       if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(169),px(25+baseY),px(22),px(22))}catch(_){}}
       const y0=76+baseY,rowH=8;
       for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,18.5,y+0.4,75);font(ctx,9.5);left(ctx,l.name,18.5,y+4.2,75);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,8);left(ctx,l.note,178,y+2.3,27)}
-      if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,35);right(ctx,plainMoney(d.tax),115,128+baseY,35);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,44)}
+      if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,30);right(ctx,plainMoney(d.tax),115,128+baseY,42);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,48)}
     }
     return canvas.toDataURL('image/jpeg',0.96);
   }
