@@ -27,8 +27,8 @@ test('date, two-line item, and amounts follow the supplied form coordinates',()=
   assert.match(source,/left\(ctx,year,155\.5,13\.5\+baseY,10\)/);
   assert.match(source,/left\(ctx,month,166\.5,13\.5\+baseY,6\)/);
   assert.match(source,/left\(ctx,day,174\.5,13\.5\+baseY,6\)/);
-  assert.match(source,/left\(ctx,l\.code,18\.5,y\+0\.4,75\)/);
-  assert.match(source,/left\(ctx,l\.name,18\.5,y\+4\.2,75\)/);
+  assert.match(source,/left\(ctx,l\.code,19\.5,y\+0\.4,74\)/);
+  assert.match(source,/left\(ctx,l\.name,19\.5,y\+4\.2,74\)/);
   assert.match(source,/left\(ctx,l\.unit,118,y\+2\.3,13\)/);
   assert.match(source,/left\(ctx,l\.note,178,y\+2\.3,27\)/);
   assert.match(source,/right\(ctx,plainMoney\(l\.price\),129,y\+2\.3,24\)/);
@@ -42,7 +42,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-10/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-11/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -54,11 +54,20 @@ test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
 });
 
 test('clean A4 title fits inside each header and date prints full Japanese units',()=>{
-  assert.match(source,/font\(ctx,13,700\);ctx\.textAlign='center'/);
+  assert.match(source,/font\(ctx,15,700\);ctx\.textAlign='center'/);
   assert.match(source,/\$\{year\}年 \$\{month\}月 \$\{day\}日/);
 });
 
 test('clean A4 form leaves the two-hole binding margin and subtotal stays in its cell',()=>{
   assert.doesNotMatch(source,/ctx\.translate\(/);
   assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,30\)/);
+});
+
+test('delivery header and customer positions follow the requested millimetres',()=>{
+  assert.match(source,/left\(ctx,salutation,95,38\+baseY,10\)/);
+  assert.match(source,/left\(ctx,customerLabel,21,42\+baseY,35\)/);
+  assert.match(source,/ctx\.measureText\(customerLabel\)\.width\/MM_TO_PX\+3/);
+  assert.match(source,/left\(ctx,'検',159\.5,54,3\);left\(ctx,'印',159\.5,57\.3,3\)/);
+  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(151,7,54,12\)/);
+  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(18\.5,72,186\.5,63\)/);
 });
