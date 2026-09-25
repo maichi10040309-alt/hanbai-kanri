@@ -30,6 +30,13 @@ test('delivery lines match the six printed columns',()=>{
   assert.doesNotMatch(css,/delivery-item-inputs input:first-child\{border-right/);
 });
 
+test('all six delivery rows are editable and retain the product-code list',()=>{
+  assert.match(app,/if\(editing\?\.type==='納品書'\)while\(editing\.lines\.length<6\)editing\.lines\.push/);
+  assert.match(app,/const code=cells\[0\]\.querySelector\('input'\),codeList=cells\[0\]\.querySelector\('datalist'\)/);
+  assert.match(app,/if\(codeList\)itemWrap\.append\(codeList\)/);
+  assert.match(app,/window\.drawLines=function\(\)\{originalDraw\(\);decorateLines\(\)\}/);
+});
+
 test('delivery editor mirrors printed header and totals layout',()=>{
   for(const selector of ['delivery-edit-title','delivery-edit-meta','delivery-edit-company','delivery-edit-approval','delivery-edit-intro','delivery-edit-totals'])assert.match(css,new RegExp(`\\.${selector}`));
   assert.match(css,/\.delivery-editor\{position:relative;min-height:760px/);

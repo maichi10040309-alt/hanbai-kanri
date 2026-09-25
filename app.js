@@ -136,7 +136,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
   }
   function shapeDeliveryLines(table){
     if(!table)return;const heads=[...table.querySelectorAll('thead th')];if(heads.length===8){heads[1].textContent='品 番 ・ 品 名';heads[7].textContent='備 考';heads[0].remove();heads[5].remove()}
-    table.querySelectorAll('tbody tr[data-line]').forEach(row=>{const cells=[...row.children];if(cells.length!==8)return;const code=cells[0].querySelector('input'),name=cells[1].querySelector('input'),tax=cells[5].querySelector('select'),actions=cells[7],itemWrap=document.createElement('div');code.placeholder='品番';name.placeholder='品名';itemWrap.className='delivery-item-inputs';itemWrap.append(code,name);cells[1].classList.add('delivery-item-cell');cells[1].append(itemWrap);tax.title='税率';tax.classList.add('delivery-tax');actions.prepend(tax);cells[0].remove();cells[5].remove()});
+    table.querySelectorAll('tbody tr[data-line]').forEach(row=>{const cells=[...row.children];if(cells.length!==8)return;const code=cells[0].querySelector('input'),codeList=cells[0].querySelector('datalist'),name=cells[1].querySelector('input'),tax=cells[5].querySelector('select'),actions=cells[7],itemWrap=document.createElement('div');code.placeholder='品番';name.placeholder='品名';itemWrap.className='delivery-item-inputs';itemWrap.append(code,name);if(codeList)itemWrap.append(codeList);cells[1].classList.add('delivery-item-cell');cells[1].append(itemWrap);tax.title='税率';tax.classList.add('delivery-tax');actions.prepend(tax);cells[0].remove();cells[5].remove()});
   }
   function decorateLines(){
     const body=document.getElementById('lines');if(!body||!editing)return;
@@ -177,6 +177,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
   window.drawLines=function(){originalDraw();decorateLines()};
   window.calc=function(){originalCalc();const t=totals();for(const [key,value] of Object.entries({sub:t.sub,tax:t.tax,total:t.total})){const node=document.querySelector(`[data-ve-total="${key}"]`);if(node)node.textContent=yen(value)}};
   window.editor=function(){
+    if(editing?.type==='納品書')while(editing.lines.length<6)editing.lines.push({id:id(),code:'',name:'',qty:1,unit:'個',price:0,tax:10});
     originalEditor();const d=editing,type=d.type,company=db.company||{},root=document.querySelector('#app'),card=root.querySelector('.card');
     card.classList.add('ve-card');const oldHeading=card.querySelector(':scope > h2');
     const form=card.querySelector('.form-grid'),lineTable=card.querySelector('.line-table'),lineButton=lineTable?.nextElementSibling,total=card.querySelector('#totals'),note=card.querySelector('#d-note')?.closest('.field'),actions=card.querySelector('.toolbar.no-print');
