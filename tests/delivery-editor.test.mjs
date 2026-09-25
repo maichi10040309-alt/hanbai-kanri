@@ -31,10 +31,29 @@ test('delivery lines match the six printed columns',()=>{
 });
 
 test('all six delivery rows are editable and retain the product-code list',()=>{
-  assert.match(app,/if\(editing\?\.type==='納品書'\)while\(editing\.lines\.length<6\)editing\.lines\.push/);
+  assert.match(app,/function padDeliveryRows\(\).*Math\.ceil\(editing\.lines\.length\/6\)\*6/);
+  assert.match(app,/window\.addLine=function\(\).*for\(let i=0;i<6;i\+\+\)editing\.lines\.push\(blankDeliveryLine\(\)\)/);
   assert.match(app,/const code=cells\[0\]\.querySelector\('input'\),codeList=cells\[0\]\.querySelector\('datalist'\)/);
   assert.match(app,/if\(codeList\)itemWrap\.append\(codeList\)/);
-  assert.match(app,/window\.drawLines=function\(\)\{originalDraw\(\);decorateLines\(\)\}/);
+  assert.match(app,/window\.drawLines=function\(\)\{padDeliveryRows\(\);originalDraw\(\);decorateLines\(\)\}/);
+});
+
+test('later delivery pages have six inputs and new products require confirmation',()=>{
+  const code=app.slice(app.indexOf('  const blankDeliveryLine='),app.indexOf('  function keepFields('));
+  const line=(code,name)=>({id:'line',code,name,qty:2,unit:'袋',price:1550,tax:8});
+  const context={editing:{type:'納品書',lines:Array.from({length:6},()=>line('KNOWN','既存商品')).concat(line('NEW-7','新商品'))},db:{products:[{id:'known',code:'KNOWN',name:'既存商品'}]},id:()=>`new-${Math.random()}`,kanaKey:s=>String(s||'').toLowerCase(),confirm:()=>false};
+  vm.runInNewContext(code,context);
+  vm.runInNewContext('padDeliveryRows()',context);
+  assert.equal(context.editing.lines.length,12);
+  assert.equal(context.editing.lines[7].name,'');
+  let prompts=0;context.confirm=()=>{prompts++;return false};
+  vm.runInNewContext('registerDeliveryProducts()',context);
+  assert.equal(prompts,1);
+  assert.equal(context.db.products.length,1);
+  context.confirm=()=>true;
+  vm.runInNewContext('registerDeliveryProducts()',context);
+  assert.equal(context.db.products.length,2);
+  assert.deepEqual({...context.db.products[1]},{id:context.db.products[1].id,code:'NEW-7',name:'新商品',unit:'袋',price:1550,tax:8});
 });
 
 test('delivery editor mirrors printed header and totals layout',()=>{

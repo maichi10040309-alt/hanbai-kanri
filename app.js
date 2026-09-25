@@ -122,11 +122,22 @@ function backup(){download(`販売管理バックアップ_${today()}.json`,JSON
 function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{try{let x=JSON.parse(fr.result);if(!x.documents||!x.customers)throw 0;if(confirm('現在のデータをバックアップ内容に置き換えますか？')){db=x;save();render();toast('復元しました')}}catch{alert('正しいバックアップファイルではありません')}};fr.readAsText(file)}
 // Editable document-shaped forms. Existing document persistence and tax rules stay in app.js.
 (function(){
-  const originalEditor=window.editor, originalDraw=window.drawLines, originalCalc=window.calc, originalSave=window.saveDoc;
+  const originalEditor=window.editor, originalDraw=window.drawLines, originalAdd=window.addLine, originalDelete=window.delLine, originalCalc=window.calc, originalSave=window.saveDoc;
   const kinds=['見積書','納品書','合計請求書','請求書','領収書'];
   const rows={見積書:17,納品書:6,合計請求書:22,請求書:12,領収書:1};
   const h=x=>esc(x??'');
   const input=(key,label,value='',kind='text')=>`<label class="ve-field"><span>${label}</span><input data-extra="${key}" type="${kind}" value="${h(value)}"></label>`;
+  const blankDeliveryLine=()=>({id:id(),code:'',name:'',qty:1,unit:'個',price:0,tax:10});
+  const emptyDeliveryLine=l=>!String(l.code||'').trim()&&!String(l.name||'').trim()&&Number(l.qty)===1&&l.unit==='個'&&Number(l.price)===0&&Number(l.tax)===10;
+  function padDeliveryRows(){if(editing?.type!=='納品書')return;const count=Math.max(6,Math.ceil(editing.lines.length/6)*6);while(editing.lines.length<count)editing.lines.push(blankDeliveryLine())}
+  function registerDeliveryProducts(){
+    if(editing?.type!=='納品書')return;
+    for(const line of editing.lines){const code=String(line.code||'').trim(),name=String(line.name||'').trim();if(!name)continue;
+      const known=db.products.some(p=>code?String(p.code||'').trim()&&kanaKey(p.code)===kanaKey(code):kanaKey(p.name)===kanaKey(name));
+      if(known||!confirm(`商品「${name}」${code?`（品番：${code}）`:''}は商品台帳にありません。登録しますか？`))continue;
+      db.products.push({id:id(),code,name,unit:line.unit||'個',price:Number(line.price)||0,tax:Number(line.tax)||0});
+    }
+  }
   function keepFields(){if(!editing)return;for(const [key,id] of [['type','d-type'],['date','d-date'],['due','d-due'],['customerName','d-customer'],['subject','d-subject'],['note','d-note']]){const el=document.getElementById(id);if(el)editing[key]=el.value}document.querySelectorAll('[data-extra]').forEach(el=>{editing[el.dataset.extra]=el.value})}
   function extras(d){
     if(d.type==='見積書')return `<div class="ve-extra ve-estimate">${input('deliveryPlace','受渡場所',d.deliveryPlace)}${input('transactionMethod','取引方法',d.transactionMethod)}${input('validUntil','有効期限',d.validUntil,'date')}${input('contactPerson','担当者',d.contactPerson)}</div>`;
@@ -174,10 +185,12 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     sheet.innerHTML=`<div class="delivery-edit-top"><div class="ve-field delivery-customer-entry"><span>得意先</span><div class="delivery-customer-control"></div></div><div class="delivery-edit-title"><h2>納品書</h2></div><div class="delivery-edit-meta"><label><b>発行日</b><span class="delivery-date-slot"></span></label><div><b>No.</b><span>${h(d.number||'保存時に発番')}</span></div><small id="ve-pages">Page. 1 / 1</small></div><div class="delivery-edit-company">${h(company.name)}<br>〒${h(company.postal)}<br>${h(company.address)}<br>TEL. ${h(company.tel)}${company.fax?`　FAX. ${h(company.fax)}`:''}${company.invoiceNo?`<br>登録番号：${h(company.invoiceNo)}`:''}${stamp}</div><div class="delivery-edit-approval"><span>検<br>印</span><span></span><span></span><span></span></div></div><div class="delivery-edit-intro">毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。</div><div class="delivery-edit-lines"></div><div class="delivery-edit-totals"><div class="delivery-total-label">合<br>計</div><div><b>税抜合計</b><strong data-ve-total="sub"></strong></div><div><b>消費税額</b><strong data-ve-total="tax"></strong></div><div><b>合計金額</b><strong data-ve-total="total"></strong></div></div><div class="delivery-edit-controls"></div><div class="delivery-edit-hidden"></div>`;
     sheet.querySelector('.delivery-customer-control').append(customer,customerList);sheet.querySelector('.delivery-date-slot').append(date);sheet.querySelector('.delivery-edit-lines').append(lineTable);sheet.querySelector('.delivery-edit-controls').append(lineButton);sheet.querySelector('.delivery-edit-hidden').append(subject,due,note);
   }
-  window.drawLines=function(){originalDraw();decorateLines()};
+  window.drawLines=function(){padDeliveryRows();originalDraw();decorateLines()};
+  window.addLine=function(){if(editing?.type!=='納品書')return originalAdd();for(let i=0;i<6;i++)editing.lines.push(blankDeliveryLine());window.drawLines()};
+  window.delLine=function(i){if(editing?.type!=='納品書')return originalDelete(i);editing.lines.splice(i,1);padDeliveryRows();if(editing.lines.length>6&&editing.lines.slice(-6).every(emptyDeliveryLine))editing.lines.splice(-6);window.drawLines()};
   window.calc=function(){originalCalc();const t=totals();for(const [key,value] of Object.entries({sub:t.sub,tax:t.tax,total:t.total})){const node=document.querySelector(`[data-ve-total="${key}"]`);if(node)node.textContent=yen(value)}};
   window.editor=function(){
-    if(editing?.type==='納品書')while(editing.lines.length<6)editing.lines.push({id:id(),code:'',name:'',qty:1,unit:'個',price:0,tax:10});
+    padDeliveryRows();
     originalEditor();const d=editing,type=d.type,company=db.company||{},root=document.querySelector('#app'),card=root.querySelector('.card');
     card.classList.add('ve-card');const oldHeading=card.querySelector(':scope > h2');
     const form=card.querySelector('.form-grid'),lineTable=card.querySelector('.line-table'),lineButton=lineTable?.nextElementSibling,total=card.querySelector('#totals'),note=card.querySelector('#d-note')?.closest('.field'),actions=card.querySelector('.toolbar.no-print');
@@ -199,7 +212,7 @@ function restore(file){if(!file)return;let fr=new FileReader();fr.onload=()=>{tr
     sheet.querySelectorAll('[data-extra]').forEach(el=>el.addEventListener('change',keepFields));
     decorateLines();window.calc();
   };
-  window.saveDoc=function(){keepFields();originalSave()};
+  window.saveDoc=function(){keepFields();if(editing?.type==='納品書'&&document.querySelector('#d-customer')?.value.trim())registerDeliveryProducts();originalSave()};
 })();
 
 // Honorific is presentation-only: never append a suffix to saved customer names.
