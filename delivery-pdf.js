@@ -21,7 +21,7 @@
       font(ctx,11);left(ctx,recipient,20,31.5+baseY,84);
       font(ctx,9);left(ctx,c?.code||'',20,43+baseY,30);
       font(ctx,9.5);left(ctx,co.name,125,24+baseY,65);
-      font(ctx,8.5);left(ctx,co.postal?`〒${co.postal}`:'',125,30+baseY,65);left(ctx,co.address,125,34+baseY,65);left(ctx,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',125,38+baseY,65);left(ctx,co.invoiceNo?`登録番号：${co.invoiceNo}`:'',125,42+baseY,65);left(ctx,co.contactPerson?`担当：${co.contactPerson}`:'',139,46+baseY,40);
+      font(ctx,8.5);left(ctx,co.postal?`〒${co.postal}`:'',125,30+baseY,65);left(ctx,co.address,125,34+baseY,65);left(ctx,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',125,38+baseY,65);left(ctx,co.invoiceNo?`登録番号：${co.invoiceNo}`:'',125,42+baseY,65);const contact=d.contactPerson??co.contactPerson;left(ctx,contact?`担当：${contact}`:'',139,46+baseY,40);
       if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(169),px(25+baseY),px(22),px(22))}catch(_){}}
       const y0=76+baseY,rowH=8;
       for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,18.5,y+0.4,75);font(ctx,9.5);left(ctx,l.name,18.5,y+4.2,75);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5)}

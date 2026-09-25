@@ -41,5 +41,5 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-4/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-5/);
 });
