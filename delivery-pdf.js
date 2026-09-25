@@ -16,7 +16,7 @@
     ctx.strokeStyle='#000';ctx.lineWidth=px(0.18);
     const box=(x,y,w,h)=>ctx.strokeRect(px(x),px(y+baseY),px(w),px(h));
     const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(px(x1),px(y1+baseY));ctx.lineTo(px(x2),px(y2+baseY));ctx.stroke()};
-    box(99,7,40,12);font(ctx,16,700);left(ctx,baseY?'納品書（控）':'納品書',105,8,31);
+    box(99,7,40,12);font(ctx,13,700);ctx.textAlign='center';ctx.fillText(baseY?'納品書（控）':'納品書',px(119),px(10+baseY),px(36));
     box(151,7,54,12);line(151,12,205,12);line(181,7,181,19);font(ctx,7);left(ctx,'発行日',158,8,16);left(ctx,'No.',188,8,12);
     line(20,40,104,40);box(159,53,46,13);line(163,53,163,66);line(177,53,177,66);line(191,53,191,66);font(ctx,7);left(ctx,'検印',159.5,55,3);
     font(ctx,8);left(ctx,'毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。',19,68,185);
@@ -32,9 +32,13 @@
     const recipient=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName);
     for(const baseY of [0,148.5]){
       if(!template)blankForm(ctx,baseY);
-      // The preprinted date has three separate boxes. Do not print 年/月/日 again.
       const [year,month,day]=pageDate(d.date);
-      font(ctx,9);left(ctx,year,155.5,13.5+baseY,10);left(ctx,month,166.5,13.5+baseY,6);left(ctx,day,174.5,13.5+baseY,6);left(ctx,d.number,186,13.5+baseY,20);
+      font(ctx,9);if(template){
+        // The supplied form already has 年/月/日 labels.
+        left(ctx,year,155.5,13.5+baseY,10);left(ctx,month,166.5,13.5+baseY,6);left(ctx,day,174.5,13.5+baseY,6);
+      }else{
+        left(ctx,`${year}年 ${month}月 ${day}日`,153,13+baseY,27);
+      }left(ctx,d.number,186,13.5+baseY,18);
       font(ctx,11);left(ctx,recipient,20,31.5+baseY,84);
       font(ctx,9);left(ctx,c?.code||'',20,43+baseY,30);
       font(ctx,9.5);left(ctx,co.name,125,24+baseY,65);
