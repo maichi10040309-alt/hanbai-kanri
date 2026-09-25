@@ -42,5 +42,13 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-6/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-7/);
+});
+
+test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
+  assert.match(print,/window\.printDeliveryPdf\(d,c,co\)/);
+  assert.match(source,/window\.printDeliveryPdf=async function/);
+  assert.match(source,/chunks\(printableLines\(d\.lines\),ROW_COUNT\)/);
+  assert.match(source,/if\(i\)pdf\.addPage\('a4','portrait'\)/);
+  assert.match(source,/if\(!template\)blankForm\(ctx,baseY\)/);
 });
