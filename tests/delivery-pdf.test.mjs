@@ -29,7 +29,10 @@ test('date, two-line item, and amounts follow the supplied form coordinates',()=
   assert.match(source,/left\(ctx,day,174\.5,13\.5\+baseY,6\)/);
   assert.match(source,/left\(ctx,l\.code,18\.5,y\+0\.4,75\)/);
   assert.match(source,/left\(ctx,l\.name,18\.5,y\+4\.2,75\)/);
+  assert.match(source,/left\(ctx,l\.unit,118,y\+2\.3,13\)/);
   assert.match(source,/right\(ctx,plainMoney\(l\.price\),129,y\+2\.3,24\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,35\)/);
+  assert.match(source,/right\(ctx,plainMoney\(d\.tax\),112,128\+baseY,35\)/);
   assert.match(source,/right\(ctx,plainMoney\(d\.total\),157,128\+baseY,44\)/);
   assert.doesNotMatch(source,/right\(ctx,money\(d\.total\)/);
 });
@@ -38,5 +41,5 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-2/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-3/);
 });
