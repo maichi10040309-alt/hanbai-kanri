@@ -65,7 +65,7 @@ test('company and bank information use the requested coordinates and typography'
   assert.match(source,/font\(ctx,9\.5\);multiline\(ctx,co\.bank\|\|'',71,60,105,4\.2,4\)/);
   assert.match(settingsSource,/id="s-contact"/);
   assert.match(settingsSource,/db\.company\.contactPerson=contactPerson/);
-  assert.match(html,/company-settings\.js\?v=20260924-2/);
+  assert.match(html,/company-settings\.js\?v=20260925-3/);
 });
 
 test('date and invoice number use their requested physical anchors and honorific follows the customer name',()=>{

@@ -16,7 +16,7 @@
     const invoice=document.querySelector('#s-invoice')?.closest('.field');
     if(invoice){
       const fax=document.createElement('div');fax.className='field';fax.innerHTML='<label for="s-fax">FAX番号</label><input id="s-fax">';fax.querySelector('input').value=company.fax||'';invoice.after(fax);
-      const contact=document.createElement('div');contact.className='field';contact.innerHTML='<label for="s-contact">担当者</label><input id="s-contact">';contact.querySelector('input').value=company.contactPerson||'';fax.after(contact);
+      const contact=document.createElement('div');contact.className='field wide';contact.innerHTML='<label for="s-contact">担当者（1行に1名）</label><textarea id="s-contact" rows="4" placeholder="例：山田太郎&#10;佐藤花子"></textarea><p class="hint">納品書の入力画面で、この一覧から担当者を選択できます。</p>';contact.querySelector('textarea').value=[...new Set([...(Array.isArray(company.contactPersons)?company.contactPersons:[]),company.contactPerson].map(name=>String(name||'').trim()).filter(Boolean))].join('\n');fax.after(contact);
     }
     const grid=document.querySelector('#s-note')?.closest('.form-grid');
     if(grid){const field=document.createElement('div');field.className='field full';field.innerHTML='<label for="s-stamp">社印画像（PNG・JPEG・WebP、500KB以下）</label><input id="s-stamp" type="file" accept="image/png,image/jpeg,image/webp"><div id="s-stamp-preview" style="margin:10px 0;min-height:40px"></div><button type="button" class="secondary" id="s-stamp-remove">社印を削除</button><p class="hint">透明背景のPNG画像がおすすめです。社印は納品書・見積書の印刷に表示されます。</p>';grid.append(field);stampPreview();field.querySelector('#s-stamp').addEventListener('change',async e=>{
@@ -25,5 +25,5 @@
       try{const image=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});pendingStamp=image;stampPreview()}catch{alert('画像を読み込めませんでした')}
     });field.querySelector('#s-stamp-remove').addEventListener('click',()=>{pendingStamp=null;field.querySelector('#s-stamp').value='';stampPreview()})}
   };
-  window.saveSettings=function(){const fax=document.querySelector('#s-fax')?.value||'',contactPerson=document.querySelector('#s-contact')?.value||'';const stamp=pendingStamp;baseSave();db.company.fax=fax;db.company.contactPerson=contactPerson;db.company.stamp=stamp;save();toast('会社情報・社印を保存しました')};
+  window.saveSettings=function(){const fax=document.querySelector('#s-fax')?.value||'',contactPersons=[...new Set((document.querySelector('#s-contact')?.value||'').split(/\r?\n/).map(name=>name.trim()).filter(Boolean))],contactPerson=contactPersons[0]||'';const stamp=pendingStamp;baseSave();db.company.fax=fax;db.company.contactPersons=contactPersons;db.company.contactPerson=contactPerson;db.company.stamp=stamp;save();toast('会社情報・担当者を保存しました')};
 })();
