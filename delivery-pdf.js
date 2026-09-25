@@ -17,10 +17,10 @@
     const box=(x,y,w,h)=>ctx.strokeRect(px(x),px(y+baseY),px(w),px(h));
     const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(px(x1),px(y1+baseY));ctx.lineTo(px(x2),px(y2+baseY));ctx.stroke()};
     box(99,7,40,12);font(ctx,15,700);ctx.textAlign='center';ctx.fillText(baseY?'納品書（控）':'納品書',px(119),px(9+baseY),px(36));
-    ctx.lineWidth=px(0.35);box(151,7,54,12);line(151,12,205,12);line(181,7,181,19);ctx.lineWidth=px(0.18);font(ctx,7);left(ctx,'発行日',158,8,16);left(ctx,'No.',188,8,12);
+    ctx.lineWidth=px(0.35);box(151,7,54,12);ctx.lineWidth=px(0.18);line(151,12,205,12);line(181,7,181,19);font(ctx,7);left(ctx,'発行日',158,8,16);left(ctx,'No.',188,8,12);
     line(20,40,90,40);box(159,53,46,13);line(163,53,163,66);line(177,53,177,66);line(191,53,191,66);font(ctx,7);left(ctx,'検',159.5,54,3);left(ctx,'印',159.5,57.3,3);
     font(ctx,8);left(ctx,'毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。',19,68,185);
-    ctx.lineWidth=px(0.35);box(18.5,72,186.5,63);for(const y of [76,84,92,100,108,116,124])line(18.5,y,205,y);
+    ctx.lineWidth=px(0.35);box(18.5,72,186.5,63);ctx.lineWidth=px(0.18);for(const y of [76,84,92,100,108,116,124])line(18.5,y,205,y);
     for(const x of [95,115,129,153,178])line(x,72,x,124);
     ctx.lineWidth=px(0.18);
     font(ctx,8);left(ctx,'品番・品名',45,72.5,45);left(ctx,'数量',99,72.5,16);left(ctx,'単位',118,72.5,10);left(ctx,'単価',136,72.5,16);left(ctx,'金額',159,72.5,18);left(ctx,'備考',186,72.5,18);
@@ -45,7 +45,7 @@
       font(ctx,9);const customerLabel='お客様番号';left(ctx,customerLabel,21,42+baseY,35);left(ctx,c?.code||'',21+ctx.measureText(customerLabel).width/MM_TO_PX+3,42+baseY,42);
       font(ctx,9.5);left(ctx,co.name,125,24+baseY,65);
       font(ctx,8.5);left(ctx,co.postal?`〒${co.postal}`:'',125,30+baseY,65);left(ctx,co.address,125,34+baseY,65);left(ctx,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',125,38+baseY,65);left(ctx,co.invoiceNo?`登録番号：${co.invoiceNo}`:'',125,42+baseY,65);const contact=d.contactPerson??co.contactPerson;left(ctx,contact?`担当：${contact}`:'',139,46+baseY,40);
-      if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(169),px(25+baseY),px(22),px(22))}catch(_){}}
+      if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(200),px(25+baseY),px(9),px(9))}catch(_){}}
       const y0=76+baseY,rowH=8;
       for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,19.5,y+0.4,74);font(ctx,9.5);left(ctx,l.name,19.5,y+4.2,74);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,8);left(ctx,l.note,178,y+2.3,27)}
       if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,30);right(ctx,plainMoney(d.tax),115,128+baseY,42);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,48)}

@@ -42,7 +42,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-11/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-12/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -68,6 +68,11 @@ test('delivery header and customer positions follow the requested millimetres',(
   assert.match(source,/left\(ctx,customerLabel,21,42\+baseY,35\)/);
   assert.match(source,/ctx\.measureText\(customerLabel\)\.width\/MM_TO_PX\+3/);
   assert.match(source,/left\(ctx,'検',159\.5,54,3\);left\(ctx,'印',159\.5,57\.3,3\)/);
-  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(151,7,54,12\)/);
-  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(18\.5,72,186\.5,63\)/);
+  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(151,7,54,12\);ctx\.lineWidth=px\(0\.18\)/);
+  assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(18\.5,72,186\.5,63\);ctx\.lineWidth=px\(0\.18\)/);
+});
+
+test('stamp begins at 200mm and fits inside the A4 right edge',()=>{
+  assert.match(source,/ctx\.drawImage\(stamp,px\(200\),px\(25\+baseY\),px\(9\),px\(9\)\)/);
+  assert.ok(200+9<210);
 });
