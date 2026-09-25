@@ -42,7 +42,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260925-9/);
+  assert.match(html,/delivery-pdf\.js\?v=20260925-10/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -58,7 +58,7 @@ test('clean A4 title fits inside each header and date prints full Japanese units
   assert.match(source,/\$\{year\}年 \$\{month\}月 \$\{day\}日/);
 });
 
-test('clean A4 form is centered and subtotal stays in its 85–115mm cell',()=>{
-  assert.match(source,/if\(!template\)ctx\.translate\(px\(\(PAGE_W-186\.5\)\/2-18\.5\),0\)/);
+test('clean A4 form leaves the two-hole binding margin and subtotal stays in its cell',()=>{
+  assert.doesNotMatch(source,/ctx\.translate\(/);
   assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,30\)/);
 });
