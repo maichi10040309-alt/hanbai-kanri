@@ -42,7 +42,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260926-2/);
+  assert.match(html,/delivery-pdf\.js\?v=20260926-3/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -75,4 +75,10 @@ test('delivery header and customer positions follow the requested millimetres',(
 test('stamp keeps its 20mm square and fits inside the printable A4 edge',()=>{
   assert.match(source,/ctx\.drawImage\(stamp,px\(185\),px\(25\+baseY\),px\(20\),px\(20\)\)/);
   assert.ok(185+20<210);
+});
+
+test('normal print uses stronger black type and lossless PNG',()=>{
+  assert.match(source,/ink==='#000'&&weight===400\?600:weight/);
+  assert.match(source,/template\?canvas\.toDataURL\('image\/jpeg',0\.96\):canvas\.toDataURL\('image\/png'\)/);
+  assert.match(source,/pdf\.addImage\(image,'PNG',0,0,PAGE_W,PAGE_H/);
 });

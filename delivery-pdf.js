@@ -7,7 +7,7 @@
   const printableLines=lines=>{const copy=[...(lines||[])];while(copy.length){const l=copy[copy.length-1];if(text(l.code).trim()||text(l.name).trim()||text(l.note).trim()||Number(l.price)||Number(l.qty)!==1)break;copy.pop()}return copy};
   const imageFrom=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src});
   let ink='#d00000';
-  function font(ctx,pt,weight=400,color=ink){ctx.font=`${weight} ${(pt+(ink==='#000'?1:0))*DPI/72}px "MS Mincho","ＭＳ 明朝","Yu Mincho",serif`;ctx.fillStyle=color;ctx.textBaseline='top'}
+  function font(ctx,pt,weight=400,color=ink){const printWeight=ink==='#000'&&weight===400?600:weight;ctx.font=`${printWeight} ${(pt+(ink==='#000'?1:0))*DPI/72}px "MS Mincho","ＭＳ 明朝","Yu Mincho",serif`;ctx.fillStyle=color;ctx.textBaseline='top'}
   function left(ctx,value,x,y,width){ctx.textAlign='left';ctx.fillText(text(value),px(x),px(y),px(width))}
   function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(text(value),px(x+width-pad),px(y),px(width-pad*2))}
   function pageDate(value){const m=text(value).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);return m?[m[1],String(Number(m[2])),String(Number(m[3]))]:[text(value),'','']}
@@ -51,7 +51,7 @@
       for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,19.5,y+0.4,74);font(ctx,9.5);left(ctx,l.name,19.5,y+4.2,74);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,8);left(ctx,l.note,178,y+2.3,27)}
       if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,30);right(ctx,plainMoney(d.tax),115,128+baseY,42);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,48)}
     }
-    return canvas.toDataURL('image/jpeg',0.96);
+    return template?canvas.toDataURL('image/jpeg',0.96):canvas.toDataURL('image/png');
   }
   window.printDeliveryTemplatePdf=async function(d,c,co){
     if(!window.jspdf?.jsPDF){alert('PDF生成機能を読み込めませんでした。ページを再読み込みしてください。');return}
@@ -61,6 +61,6 @@
   window.printDeliveryPdf=async function(d,c,co){
     if(!window.jspdf?.jsPDF){alert('PDF生成機能を読み込めませんでした。ページを再読み込みしてください。');return}
     const preview=window.open('','_blank');if(!preview){alert('PDFを開けません。ポップアップを許可してください。');return}preview.document.write('<p style="font-family:serif">納品書PDFを生成しています…</p>');
-    try{await document.fonts.ready;const pages=chunks(printableLines(d.lines),ROW_COUNT),{jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});for(let i=0;i<pages.length;i++){if(i)pdf.addPage('a4','portrait');const image=await renderPage(d,c||{},co||{},pages[i],i,pages.length,null);pdf.addImage(image,'JPEG',0,0,PAGE_W,PAGE_H,undefined,'FAST')}const url=URL.createObjectURL(pdf.output('blob'));preview.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),300000)}catch(error){preview.close();console.error(error);alert('納品書PDF生成に失敗しました。')}
+    try{await document.fonts.ready;const pages=chunks(printableLines(d.lines),ROW_COUNT),{jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});for(let i=0;i<pages.length;i++){if(i)pdf.addPage('a4','portrait');const image=await renderPage(d,c||{},co||{},pages[i],i,pages.length,null);pdf.addImage(image,'PNG',0,0,PAGE_W,PAGE_H,undefined,'FAST')}const url=URL.createObjectURL(pdf.output('blob'));preview.location.replace(url);setTimeout(()=>URL.revokeObjectURL(url),300000)}catch(error){preview.close();console.error(error);alert('納品書PDF生成に失敗しました。')}
   };
 })();
