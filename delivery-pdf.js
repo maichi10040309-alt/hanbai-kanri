@@ -45,7 +45,7 @@
       font(ctx,9);const customerLabel='お客様番号';left(ctx,customerLabel,21,42+baseY,35);left(ctx,c?.code||'',21+ctx.measureText(customerLabel).width/MM_TO_PX+3,42+baseY,42);
       font(ctx,9.5);left(ctx,co.name,125,24+baseY,65);
       font(ctx,8.5);left(ctx,co.postal?`〒${co.postal}`:'',125,30+baseY,65);left(ctx,co.address,125,34+baseY,65);left(ctx,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',125,38+baseY,65);left(ctx,co.invoiceNo?`登録番号：${co.invoiceNo}`:'',125,42+baseY,65);const contact=d.contactPerson??co.contactPerson;left(ctx,contact?`担当：${contact}`:'',139,46+baseY,40);
-      if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(200),px(25+baseY),px(9),px(9))}catch(_){}}
+      if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(185),px(25+baseY),px(20),px(20))}catch(_){}}
       const y0=76+baseY,rowH=8;
       for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,19.5,y+0.4,74);font(ctx,9.5);left(ctx,l.name,19.5,y+4.2,74);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,8);left(ctx,l.note,178,y+2.3,27)}
       if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,30);right(ctx,plainMoney(d.tax),115,128+baseY,42);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,48)}
