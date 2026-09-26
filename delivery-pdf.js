@@ -30,6 +30,7 @@
   async function renderPage(d,c,co,lines,pageIndex,pageCount,template){
     const canvas=document.createElement('canvas');canvas.width=Math.round(px(PAGE_W));canvas.height=Math.round(px(PAGE_H));
     const ctx=canvas.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);if(template)ctx.drawImage(template,0,0,canvas.width,canvas.height);ctx.imageSmoothingEnabled=true;ink=template?'#d00000':'#000';
+    ctx.translate(px(-2),0);
     const recipient=typeof recipientLabel==='function'?recipientLabel(d):text(d.customerName);
     const match=recipient.match(/^(.*?)(様|御中)$/),recipientName=match?match[1].trim():recipient,salutation=match?match[2]:'';
     for(const baseY of [0,148.5]){
