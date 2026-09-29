@@ -31,7 +31,7 @@ test('date, two-line item, and amounts follow the supplied form coordinates',()=
   assert.match(source,/left\(ctx,l\.code,19\.5,y\+0\.4,74\)/);
   assert.match(source,/left\(ctx,l\.name,19\.5,y\+4\.2,74\)/);
   assert.match(source,/left\(ctx,l\.unit,118,y\+2\.3,13\)/);
-  assert.match(source,/left\(ctx,l\.note,178,y\+2\.3,27\)/);
+  assert.match(source,/wrapDeliveryNote\(l\.note,ctx,px\(25\)\)\.slice\(0,3\)/);
   assert.match(source,/right\(ctx,plainMoney\(l\.price\),129,y\+2\.3,24\)/);
   assert.match(source,/right\(ctx,plainMoney\(d\.sub\),85,128\+baseY,30\)/);
   assert.match(source,/right\(ctx,plainMoney\(d\.tax\),115,128\+baseY,42\)/);
@@ -43,7 +43,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260929-1/);
+  assert.match(html,/delivery-pdf\.js\?v=20260929-2/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -100,4 +100,12 @@ test('original and copy draw every form label at corresponding positions',()=>{
     assert.ok(Math.abs(copy[i].y-original[i].y-148.5*300/25.4)<0.001,original[i].value);
   }
   for(const value of ['検','印','品番・品名','数量','単位','単価','金額','備考'])assert.ok(copy.some(x=>x.value===value),value);
+});
+
+test('remarks wrap after available width and preserve manual newlines',()=>{
+  const sandbox={window:{}};
+  runInNewContext(source.replace(/\}\)\(\);\s*$/, 'globalThis.wrapForTest=wrapDeliveryNote;})();'),sandbox);
+  const ctx={measureText:value=>({width:[...value].length*10})};
+  assert.deepEqual(Array.from(sandbox.wrapForTest('あいうえお',ctx,20)),['あい','うえ','お']);
+  assert.deepEqual(Array.from(sandbox.wrapForTest('AB\nCD',ctx,20)),['AB','CD']);
 });

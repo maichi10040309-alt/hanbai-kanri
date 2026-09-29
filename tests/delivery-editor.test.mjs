@@ -30,11 +30,11 @@ test('delivery lines match the six printed columns',()=>{
   assert.doesNotMatch(css,/delivery-item-inputs input:first-child\{border-right/);
 });
 test('delivery remarks are editable and tax is placed with unit price',()=>{
-  assert.match(app,/note\.placeholder='備考'/);
-  assert.match(app,/note\.addEventListener\('input',\(\)=>\{editing\.lines\[index\]\.note=note\.value\}\)/);
+  assert.match(app,/note\.placeholder='備考（3行まで）'/);
+  assert.match(app,/editing\.lines\[index\]\.note=note\.value/);
   assert.match(app,/priceWrap\.append\(cells\[4\]\.querySelector\('input'\),tax\)/);
   assert.match(app,/actions\.prepend\(note\)/);
-  assert.match(css,/\.delivery-edit-lines \.delivery-note\{width:calc\(100% - 22px\)/);
+  assert.match(css,/\.delivery-edit-lines \.delivery-note\{width:25mm/);
 });
 
 test('all six delivery rows are editable and retain the product-code list',()=>{
@@ -110,4 +110,10 @@ test('product code candidates filter the code field and fill the selected produc
   assert.equal(context.editing.lines[0].tax,8);
   vm.runInNewContext("pickProductCode(0,'自由入力')",context);
   assert.equal(context.editing.lines[0].code,'自由入力');
+});
+
+test('delivery remarks allow three wrapped lines in the editor',()=>{
+  assert.match(app,/document\.createElement\('textarea'\);note\.rows=3/);
+  assert.match(app,/window\.deliveryNoteLines\(note\.value\)\.length>3/);
+  assert.match(css,/\.delivery-edit-lines \.delivery-note\{width:25mm;max-width:calc\(100% - 22px\)/);
 });

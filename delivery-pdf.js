@@ -12,6 +12,21 @@
   function right(ctx,value,x,y,width,pad=1){ctx.textAlign='right';ctx.fillText(text(value),px(x+width-pad),px(y),px(width-pad*2))}
   function pageDate(value){const m=text(value).match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);return m?[m[1],String(Number(m[2])),String(Number(m[3]))]:[text(value),'','']}
   function plainMoney(value){return Math.round(Number(value)||0).toLocaleString('ja-JP')}
+  function wrapDeliveryNote(value,ctx,maxWidth){
+    const lines=[''];
+    for(const char of text(value).replace(/\r\n?/g,'\n')){
+      if(char==='\n'){lines.push('');continue}
+      const last=lines.length-1,next=lines[last]+char;
+      if(lines[last]&&ctx.measureText(next).width>maxWidth)lines.push(char);
+      else lines[last]=next;
+    }
+    return lines;
+  }
+  window.deliveryNoteLines=value=>{
+    const ctx=document.createElement('canvas').getContext('2d');
+    ctx.font=`600 ${7*96/72}px "MS Mincho","ＭＳ 明朝","Yu Mincho",serif`;
+    return wrapDeliveryNote(value,ctx,25*96/25.4);
+  };
   function blankForm(ctx,baseY){
     ctx.strokeStyle='#000';ctx.lineWidth=px(0.18);
     const box=(x,y,w,h)=>ctx.strokeRect(px(x),px(y+baseY),px(w),px(h));
@@ -49,7 +64,7 @@
       font(ctx,8.5);left(ctx,co.postal?`〒${co.postal}`:'',125,30+baseY,65);left(ctx,co.address,125,34+baseY,65);left(ctx,co.tel||co.fax?`TEL. ${co.tel||''}${co.fax?`  FAX. ${co.fax}`:''}`:'',125,38+baseY,65);left(ctx,co.invoiceNo?`登録番号：${co.invoiceNo}`:'',125,42+baseY,65);const contact=d.contactPerson??co.contactPerson;left(ctx,contact?`担当：${contact}`:'',139,46+baseY,40);
       if(co.stamp&&/^data:image\/(?:png|jpeg|webp);base64,/.test(co.stamp)){try{const stamp=await imageFrom(co.stamp);ctx.drawImage(stamp,px(185),px(25+baseY),px(20),px(20))}catch(_){}}
       const y0=76+baseY,rowH=8;
-      for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,19.5,y+0.4,74);font(ctx,9.5);left(ctx,l.name,19.5,y+4.2,74);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,8);left(ctx,l.note,178,y+2.3,27)}
+      for(let i=0;i<ROW_COUNT;i++){const l=lines[i];if(!l)continue;const y=y0+i*rowH;font(ctx,9);left(ctx,l.code,19.5,y+0.4,74);font(ctx,9.5);left(ctx,l.name,19.5,y+4.2,74);font(ctx,9);right(ctx,l.qty,95,y+2.3,20);left(ctx,l.unit,118,y+2.3,13);right(ctx,plainMoney(l.price),129,y+2.3,24);right(ctx,plainMoney(l.amount??Number(l.qty)*Number(l.price)),153,y+2.3,24.5);font(ctx,6);wrapDeliveryNote(l.note,ctx,px(25)).slice(0,3).forEach((part,n)=>left(ctx,part,179,y+0.25+n*2.5,25))}
       if(pageIndex===pageCount-1){font(ctx,9);right(ctx,plainMoney(d.sub),85,128+baseY,30);right(ctx,plainMoney(d.tax),115,128+baseY,42);font(ctx,10,700);right(ctx,plainMoney(d.total),157,128+baseY,48)}
     }
     return template?canvas.toDataURL('image/jpeg',0.96):canvas.toDataURL('image/png');

@@ -27,8 +27,8 @@ test('summary totals and lines use the blue seven-column form',()=>{
 });
 
 test('editor assets are cache-busted',()=>{
-  assert.match(html,/voucher-editor\.css\?v=20260925-11/);
-  assert.match(html,/app\.js\?v=20260925-25/);
+  assert.match(html,/voucher-editor\.css\?v=20260929-1/);
+  assert.match(html,/app\.js\?v=20260929-1/);
   assert.match(html,/print-templates\.js\?v=20260925-40/);
 });
 
