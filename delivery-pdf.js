@@ -16,16 +16,17 @@
     ctx.strokeStyle='#000';ctx.lineWidth=px(0.18);
     const box=(x,y,w,h)=>ctx.strokeRect(px(x),px(y+baseY),px(w),px(h));
     const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(px(x1),px(y1+baseY));ctx.lineTo(px(x2),px(y2+baseY));ctx.stroke()};
+    const label=(value,x,y,width)=>left(ctx,value,x,y+baseY,width);
     box(99,7,40,12);font(ctx,15,700);ctx.textAlign='center';ctx.fillText(baseY?'納品書（控）':'納品書',px(119),px(9+baseY),px(36));
-    ctx.lineWidth=px(0.35);box(151,7,54,12);ctx.lineWidth=px(0.18);line(151,12,205,12);line(181,7,181,19);font(ctx,7);left(ctx,'発行日',158,8,16);left(ctx,'No.',188,8,12);
-    line(20,40,90,40);box(159,53,46,13);line(163,53,163,66);line(177,53,177,66);line(191,53,191,66);font(ctx,7);left(ctx,'検',159.5,54,3);left(ctx,'印',159.5,57.3,3);
-    font(ctx,8);left(ctx,'毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。',19,68,185);
+    ctx.lineWidth=px(0.35);box(151,7,54,12);ctx.lineWidth=px(0.18);line(151,12,205,12);line(181,7,181,19);font(ctx,7);label('発行日',158,8,16);label('No.',188,8,12);
+    line(20,40,90,40);box(159,53,46,13);line(163,53,163,66);line(177,53,177,66);line(191,53,191,66);font(ctx,7);label('検',159.5,54,3);label('印',159.5,57.3,3);
+    font(ctx,8);label('毎度ありがとうございます。下記の通り納品致しましたのでご査収下さい。',19,68,185);
     ctx.lineWidth=px(0.35);box(18.5,72,186.5,63);ctx.lineWidth=px(0.18);for(const y of [76,84,92,100,108,116,124])line(18.5,y,205,y);
     for(const x of [95,115,129,153,178])line(x,72,x,124);
     ctx.lineWidth=px(0.18);
-    font(ctx,8);left(ctx,'品番・品名',45,72.5,45);left(ctx,'数量',99,72.5,16);left(ctx,'単位',118,72.5,10);left(ctx,'単価',136,72.5,16);left(ctx,'金額',159,72.5,18);left(ctx,'備考',186,72.5,18);
+    font(ctx,8);label('品番・品名',45,72.5,45);label('数量',99,72.5,16);label('単位',118,72.5,10);label('単価',136,72.5,16);label('金額',159,72.5,18);label('備考',186,72.5,18);
     line(85,124,85,135);line(115,124,115,135);line(157,124,157,135);
-    font(ctx,7);left(ctx,'税抜合計',86,124.5,28);left(ctx,'消費税額',116,124.5,39);left(ctx,'合計金額',158,124.5,45);
+    font(ctx,7);label('税抜合計',86,124.5,28);label('消費税額',116,124.5,39);label('合計金額',158,124.5,45);
   }
   async function renderPage(d,c,co,lines,pageIndex,pageCount,template){
     const canvas=document.createElement('canvas');canvas.width=Math.round(px(PAGE_W));canvas.height=Math.round(px(PAGE_H));

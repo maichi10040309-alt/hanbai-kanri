@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,statSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 
 const source=readFileSync(new URL('../delivery-pdf.js',import.meta.url),'utf8');
 const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
@@ -42,7 +43,7 @@ test('delivery lists expose the alignment PDF action',()=>{
   assert.match(app,/if\(d\.type==='納品書'\)return `<button onclick="printDeliveryTemplate/);
   assert.match(print,/window\.printDeliveryTemplate=function/);
   assert.match(print,/window\.printDeliveryTemplatePdf\(d,c,co\)/);
-  assert.match(html,/delivery-pdf\.js\?v=20260926-3/);
+  assert.match(html,/delivery-pdf\.js\?v=20260929-1/);
 });
 
 test('normal delivery printing makes one A4 PDF per six populated rows',()=>{
@@ -67,7 +68,7 @@ test('delivery header and customer positions follow the requested millimetres',(
   assert.match(source,/left\(ctx,salutation,95,38\+baseY,10\)/);
   assert.match(source,/left\(ctx,customerLabel,21,42\+baseY,35\)/);
   assert.match(source,/ctx\.measureText\(customerLabel\)\.width\/MM_TO_PX\+3/);
-  assert.match(source,/left\(ctx,'検',159\.5,54,3\);left\(ctx,'印',159\.5,57\.3,3\)/);
+  assert.match(source,/label\('検',159\.5,54,3\);label\('印',159\.5,57\.3,3\)/);
   assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(151,7,54,12\);ctx\.lineWidth=px\(0\.18\)/);
   assert.match(source,/ctx\.lineWidth=px\(0\.35\);box\(18\.5,72,186\.5,63\);ctx\.lineWidth=px\(0\.18\)/);
 });
@@ -81,4 +82,22 @@ test('normal print uses stronger black type and lossless PNG',()=>{
   assert.match(source,/ink==='#000'&&weight===400\?600:weight/);
   assert.match(source,/template\?canvas\.toDataURL\('image\/jpeg',0\.96\):canvas\.toDataURL\('image\/png'\)/);
   assert.match(source,/pdf\.addImage\(image,'PNG',0,0,PAGE_W,PAGE_H/);
+});
+
+test('original and copy draw every form label at corresponding positions',()=>{
+  const sandbox={window:{}};
+  runInNewContext(source.replace(/\}\)\(\);\s*$/, 'globalThis.blankFormForTest=blankForm;})();'),sandbox);
+  function labels(baseY){
+    const drawn=[];
+    const ctx={strokeRect(){},beginPath(){},moveTo(){},lineTo(){},stroke(){},fillText(value,x,y){drawn.push({value,x,y})}};
+    sandbox.blankFormForTest(ctx,baseY);
+    return drawn;
+  }
+  const original=labels(0),copy=labels(148.5);
+  assert.deepEqual(copy.map(x=>x.value),original.map(x=>x.value).map(x=>x==='納品書'?'納品書（控）':x));
+  for(let i=0;i<original.length;i++){
+    assert.equal(copy[i].x,original[i].x);
+    assert.ok(Math.abs(copy[i].y-original[i].y-148.5*300/25.4)<0.001,original[i].value);
+  }
+  for(const value of ['検','印','品番・品名','数量','単位','単価','金額','備考'])assert.ok(copy.some(x=>x.value===value),value);
 });
